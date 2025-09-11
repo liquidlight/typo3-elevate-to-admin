@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2024-01-01T00:00:00Z" product-name="elevate_to_admin">
+		<header/>
+		<body>
+			<trans-unit id="be_users.tx_elevate_to_admin_is_possible_admin">
+				<source>Can elevate to admin</source>
+			</trans-unit>
+			<trans-unit id="be_users.tx_elevate_to_admin_admin_since">
+				<source>Admin since</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

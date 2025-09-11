@@ -1,0 +1,21 @@
+{
+    "name": "liquidlight/typo3-elevate-to-admin",
+    "type": "typo3-cms-extension",
+    "version": "0.0.0",
+    "authors": [
+        {
+            "name": "Mike Street",
+            "email": "mike@liquidlight.co.uk"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "LiquidLight\\ElevateToAdmin\\": "Classes"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "elevate_to_admin"
+        }
+    }
+}
