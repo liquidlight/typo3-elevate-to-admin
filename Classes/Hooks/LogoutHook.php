@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace LiquidLight\ElevateToAdmin\Hooks;
 
+use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
 use TYPO3\CMS\Core\Authentication\AbstractUserAuthentication;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LogoutHook
 {
-	private const TABLE_BE_USERS = 'be_users';
-
-	private const FIELD_ADMIN_SINCE = 'tx_elevate_to_admin_admin_since';
+	use AdminElevationTrait;
 
 	/**
 	 * Called before a user is logged out
@@ -28,21 +25,5 @@ class LogoutHook
 
 		// Clear admin elevation fields
 		$this->clearAdminElevation($userId);
-	}
-
-	private function clearAdminElevation(int $userId): void
-	{
-		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-			->getConnectionForTable(self::TABLE_BE_USERS)
-		;
-
-		$connection->update(
-			self::TABLE_BE_USERS,
-			[
-				'admin' => 0,
-				self::FIELD_ADMIN_SINCE => 0,
-			],
-			['uid' => $userId]
-		);
 	}
 }

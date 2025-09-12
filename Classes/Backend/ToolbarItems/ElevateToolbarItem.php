@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace LiquidLight\ElevateToAdmin\Backend\ToolbarItems;
 
+use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
 use TYPO3\CMS\Backend\Toolbar\ToolbarItemInterface;
-use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class ElevateToolbarItem implements ToolbarItemInterface
 {
-	private const FIELD_IS_POSSIBLE_ADMIN = 'tx_elevate_to_admin_is_possible_admin';
+	use AdminElevationTrait;
 
 	public function __construct(
 	) {
@@ -21,12 +21,7 @@ class ElevateToolbarItem implements ToolbarItemInterface
 
 	public function checkAccess(): bool
 	{
-		$user = $this->getBackendUser();
-		if (!$user) {
-			return false;
-		}
-
-		return (bool)($user->user[self::FIELD_IS_POSSIBLE_ADMIN] ?? false);
+		return $this->canUserElevate();
 	}
 
 	public function getItem(): string
@@ -76,11 +71,6 @@ class ElevateToolbarItem implements ToolbarItemInterface
 	protected function getPageRenderer()
 	{
 		return GeneralUtility::makeInstance(PageRenderer::class);
-	}
-
-	protected function getBackendUser(): BackendUserAuthentication
-	{
-		return $GLOBALS['BE_USER'];
 	}
 
 	/**

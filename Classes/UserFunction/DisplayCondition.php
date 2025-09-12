@@ -2,15 +2,19 @@
 
 namespace LiquidLight\ElevateToAdmin\UserFunction;
 
+use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
+
 class DisplayCondition
 {
+	use AdminElevationTrait;
+
 	/**
 	 * Check if current user is admin and not editing their own record
 	 *
 	 */
 	public function isAdminAndNotSelf(array $parameters): bool
 	{
-		$backendUser = $GLOBALS['BE_USER'] ?? null;
+		$backendUser = $this->getBackendUser();
 
 		if (!$backendUser || !$backendUser->isAdmin()) {
 			return false;
@@ -36,7 +40,7 @@ class DisplayCondition
 	 */
 	public function isAdmin(array $parameters): bool
 	{
-		$backendUser = $GLOBALS['BE_USER'] ?? null;
+		$backendUser = $this->getBackendUser();
 
 		return $backendUser && $backendUser->isAdmin();
 	}
