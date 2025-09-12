@@ -5,6 +5,13 @@ define([
 ], function (Modal, AjaxRequest, Notification) {
 	'use strict';
 
+	/**
+	 * Get localized string
+	 */
+	function getLabel(key) {
+		return TYPO3.lang['elevate_to_admin.' + key] || key;
+	}
+
 	var ElevateAdmin = {
 
 		initialize: function() {
@@ -49,25 +56,25 @@ define([
 			var self = this,
 				html = $(
 					'<div class="form-group">' +
-						'<label for="admin-password">Please enter your password to enter admin mode:</label>' +
-						'<input type="password" class="form-control" id="admin-password" placeholder="Password" />' +
+						'<label for="admin-password">' + getLabel('modal.password_label') + '</label>' +
+						'<input type="password" class="form-control" id="admin-password" placeholder="' + getLabel('modal.password_placeholder') + '" />' +
 					'</div>'
 				);
 
 			var modal = Modal.show(
-				'Enter admin mode',
+				getLabel('modal.enter_admin_title'),
 				html,
 				Modal.sizes.small,
 				[
 					{
-						text: 'Cancel',
+						text: getLabel('modal.cancel'),
 						btnClass: 'btn-default',
 						trigger: function() {
 							Modal.dismiss();
 						}
 					},
 					{
-						text: 'Enter',
+						text: getLabel('modal.enter'),
 						btnClass: 'btn-danger',
 						trigger: function() {
 							self.processElevation();
@@ -92,7 +99,7 @@ define([
 		processElevation: function() {
 			var field = document.getElementById('admin-password');
 			var password = field ? field.value : '';
-			if (!password) { Notification.error('Error', 'Password is required'); return; }
+			if (!password) { Notification.error(getLabel('js.error_title'), getLabel('error.password_required')); return; }
 			new AjaxRequest(TYPO3.settings.ajaxUrls.elevate_admin).post({ password: password })
 				.then(async response => await response.resolve())
 				.then(function (data) {
@@ -101,19 +108,19 @@ define([
 					} catch (e) { console.log('Modal hide error:', e); }
 
 					if (data && data.success) {
-						Notification.success('Success', data.message || 'Successfully elevated to admin');
+						Notification.success(getLabel('js.success_title'), data.message || getLabel('success.elevated_to_admin'));
 						if (data.reload) {
 							setTimeout(function () { window.location.reload(); }, 1000);
 						}
 					} else {
-						Notification.error('Error', (data && data.message) || 'Elevation failed');
+						Notification.error(getLabel('js.error_title'), (data && data.message) || getLabel('js.elevation_failed'));
 					}
 				}).catch(function (error) {
 					try {
 						Modal.dismiss();
 					} catch (e) { }
 					console.error('Elevation error:', error);
-					Notification.error('Error', 'Failed to process elevation request');
+					Notification.error(getLabel('js.error_title'), getLabel('js.elevation_request_failed'));
 				});
 		},
 
@@ -121,19 +128,19 @@ define([
 			var self = this;
 
 			Modal.confirm(
-				'Leave Admin Mode',
-				'Are you sure you want to leave admin mode? You will need to re-authenticate to regain admin privileges.',
+				getLabel('modal.leave_admin_title'),
+				getLabel('modal.leave_admin_message'),
 				'warning',
 				[
 					{
-						text: 'Cancel',
+						text: getLabel('modal.cancel'),
 						btnClass: 'btn-default',
 						trigger: function() {
 							Modal.dismiss();
 						}
 					},
 					{
-						text: 'Leave Admin Mode',
+						text: getLabel('modal.leave_admin_button'),
 						btnClass: 'btn-warning',
 						trigger: function() {
 							self.performLeaveAdmin();
@@ -150,16 +157,16 @@ define([
 					Modal.dismiss();
 
 					if (data && data.success) {
-						Notification.success('Success', data.message);
+						Notification.success(getLabel('js.success_title'), data.message);
 						if (data.reload) {
 							setTimeout(function () { window.location.reload(); }, 500);
 						}
 					} else {
-						Notification.error('Error', (data && data.message) || 'Failed to leave admin mode');
+						Notification.error(getLabel('js.error_title'), (data && data.message) || getLabel('js.leave_admin_failed'));
 					}
 				}).catch(function (error) {
 					console.error('Leave admin error:', error);
-					Notification.error('Error', 'Failed to process leave admin request');
+					Notification.error(getLabel('js.error_title'), getLabel('js.leave_admin_request_failed'));
 				});
 		}
 	};

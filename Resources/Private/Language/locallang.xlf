@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2024-01-01T00:00:00Z" product-name="elevate_to_admin">
+		<header/>
+		<body>
+			<!-- Backend error messages -->
+			<trans-unit id="error.no_backend_user">
+				<source>No backend user found</source>
+			</trans-unit>
+			<trans-unit id="error.user_not_allowed">
+				<source>User not allowed to elevate</source>
+			</trans-unit>
+			<trans-unit id="error.already_admin">
+				<source>User is already admin</source>
+			</trans-unit>
+			<trans-unit id="error.password_required">
+				<source>Password is required</source>
+			</trans-unit>
+			<trans-unit id="error.invalid_password">
+				<source>Invalid password</source>
+			</trans-unit>
+			<trans-unit id="error.not_admin">
+				<source>User is not admin</source>
+			</trans-unit>
+			<trans-unit id="error.cannot_leave_permanent">
+				<source>Cannot leave permanent admin mode</source>
+			</trans-unit>
+
+			<!-- Success messages -->
+			<trans-unit id="success.elevated_to_admin">
+				<source>Successfully elevated to admin</source>
+			</trans-unit>
+			<trans-unit id="success.left_admin_mode">
+				<source>Successfully left admin mode</source>
+			</trans-unit>
+
+			<!-- Toolbar item labels -->
+			<trans-unit id="toolbar.exit_admin_mode">
+				<source>Exit Admin Mode</source>
+			</trans-unit>
+			<trans-unit id="toolbar.enter_admin_mode">
+				<source>Enter Admin Mode</source>
+			</trans-unit>
+			<trans-unit id="toolbar.title">
+				<source>Admin Elevation</source>
+			</trans-unit>
+
+			<!-- JavaScript modal and form labels -->
+			<trans-unit id="modal.enter_admin_title">
+				<source>Enter admin mode</source>
+			</trans-unit>
+			<trans-unit id="modal.password_label">
+				<source>Please enter your password to enter admin mode:</source>
+			</trans-unit>
+			<trans-unit id="modal.password_placeholder">
+				<source>Password</source>
+			</trans-unit>
+			<trans-unit id="modal.cancel">
+				<source>Cancel</source>
+			</trans-unit>
+			<trans-unit id="modal.enter">
+				<source>Enter</source>
+			</trans-unit>
+			<trans-unit id="modal.leave_admin_title">
+				<source>Leave Admin Mode</source>
+			</trans-unit>
+			<trans-unit id="modal.leave_admin_message">
+				<source>Are you sure you want to leave admin mode? You will need to re-authenticate to regain admin privileges.</source>
+			</trans-unit>
+			<trans-unit id="modal.leave_admin_button">
+				<source>Leave Admin Mode</source>
+			</trans-unit>
+
+			<!-- JavaScript error messages -->
+			<trans-unit id="js.error_title">
+				<source>Error</source>
+			</trans-unit>
+			<trans-unit id="js.success_title">
+				<source>Success</source>
+			</trans-unit>
+			<trans-unit id="js.elevation_failed">
+				<source>Elevation failed</source>
+			</trans-unit>
+			<trans-unit id="js.elevation_request_failed">
+				<source>Failed to process elevation request</source>
+			</trans-unit>
+			<trans-unit id="js.leave_admin_failed">
+				<source>Failed to leave admin mode</source>
+			</trans-unit>
+			<trans-unit id="js.leave_admin_request_failed">
+				<source>Failed to process leave admin request</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

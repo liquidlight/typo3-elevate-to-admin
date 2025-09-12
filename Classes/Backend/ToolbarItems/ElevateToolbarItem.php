@@ -6,6 +6,7 @@ namespace LiquidLight\ElevateToAdmin\Backend\ToolbarItems;
 
 use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
 use TYPO3\CMS\Backend\Toolbar\ToolbarItemInterface;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
@@ -17,6 +18,7 @@ class ElevateToolbarItem implements ToolbarItemInterface
 	public function __construct(
 	) {
 		$this->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/ElevateToAdmin/ElevateAdmin');
+		$this->addJavaScriptLanguageLabels();
 	}
 
 	public function checkAccess(): bool
@@ -44,13 +46,13 @@ class ElevateToolbarItem implements ToolbarItemInterface
 		if ($this->getBackendUser()->isAdmin()) {
 			$view->assignMultiple([
 				'icon' => 'actions-logout',
-				'label' => 'Exit Admin Mode',
+				'label' => $this->translate('toolbar.exit_admin_mode'),
 				'id' => 'exit-admin-mode',
 			]);
 		} else {
 			$view->assignMultiple([
 				'icon' => 'actions-logout',
-				'label' => 'Enter Admin Mode',
+				'label' => $this->translate('toolbar.enter_admin_mode'),
 				'id' => 'enter-admin-mode',
 			]);
 		}
@@ -98,5 +100,44 @@ class ElevateToolbarItem implements ToolbarItemInterface
 		$view->getRequest()->setControllerExtensionName('Backend');
 
 		return $view;
+	}
+
+	private function getLanguageService(): LanguageService
+	{
+		return $GLOBALS['LANG'];
+	}
+
+	private function translate(string $key): string
+	{
+		return $this->getLanguageService()->sL('LLL:EXT:elevate_to_admin/Resources/Private/Language/locallang.xlf:' . $key);
+	}
+
+	private function addJavaScriptLanguageLabels(): void
+	{
+		$labels = [
+			'modal.enter_admin_title',
+			'modal.password_label',
+			'modal.password_placeholder',
+			'modal.cancel',
+			'modal.enter',
+			'modal.leave_admin_title',
+			'modal.leave_admin_message',
+			'modal.leave_admin_button',
+			'js.error_title',
+			'js.success_title',
+			'js.elevation_failed',
+			'js.elevation_request_failed',
+			'js.leave_admin_failed',
+			'js.leave_admin_request_failed',
+			'error.password_required',
+			'success.elevated_to_admin',
+		];
+
+		$languageLabels = [];
+		foreach ($labels as $key) {
+			$languageLabels['elevate_to_admin.' . $key] = $this->translate($key);
+		}
+
+		$this->getPageRenderer()->addInlineLanguageLabelArray($languageLabels);
 	}
 }

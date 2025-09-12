@@ -8,7 +8,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 $tempColumns = [
 	'tx_elevate_to_admin_is_possible_admin' => [
 		'exclude' => 1,
-		'label' => 'LLL:EXT:elevate_to_admin/Resources/Private/Language/locallang_db.xlf:be_users.tx_elevate_to_admin_is_possible_admin',
+		'label' => 'LLL:EXT:elevate_to_admin/Resources/Private/Language/locallang_tca.xlf:be_users.tx_elevate_to_admin_is_possible_admin',
 		'config' => [
 			'type' => 'check',
 			'renderType' => 'checkboxToggle',
@@ -23,7 +23,7 @@ $tempColumns = [
 	],
 	'tx_elevate_to_admin_admin_since' => [
 		'exclude' => 1,
-		'label' => 'LLL:EXT:elevate_to_admin/Resources/Private/Language/locallang_db.xlf:be_users.tx_elevate_to_admin_admin_since',
+		'label' => 'LLL:EXT:elevate_to_admin/Resources/Private/Language/locallang_tca.xlf:be_users.tx_elevate_to_admin_admin_since',
 		'config' => [
 			'type' => 'input',
 			'renderType' => 'inputDateTime',

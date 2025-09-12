@@ -8,7 +8,9 @@ use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 use TYPO3\CMS\Core\Http\JsonResponse;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ElevationController
@@ -20,7 +22,7 @@ class ElevationController
 		$backendUser = $this->getBackendUser();
 
 		if (!$backendUser instanceof BackendUserAuthentication) {
-			return new JsonResponse(['success' => false, 'message' => 'No backend user found']);
+			return new JsonResponse(['success' => false, 'message' => $this->translate('error.no_backend_user')]);
 		}
 
 		$parsedBody = $request->getParsedBody();
@@ -33,23 +35,33 @@ class ElevationController
 		return $this->elevateToAdmin($backendUser, $parsedBody);
 	}
 
+	private function getLanguageService(): LanguageService
+	{
+		return $GLOBALS['LANG'];
+	}
+
+	private function translate(string $key): string
+	{
+		return $this->getLanguageService()->sL('LLL:EXT:elevate_to_admin/Resources/Private/Language/locallang.xlf:' . $key);
+	}
+
 	private function elevateToAdmin(BackendUserAuthentication $backendUser, array $parsedBody): ResponseInterface
 	{
 		if (!$this->canUserElevate($backendUser)) {
-			return new JsonResponse(['success' => false, 'message' => 'User not allowed to elevate']);
+			return new JsonResponse(['success' => false, 'message' => $this->translate('error.user_not_allowed')]);
 		}
 
 		if ($backendUser->isAdmin()) {
-			return new JsonResponse(['success' => false, 'message' => 'User is already admin']);
+			return new JsonResponse(['success' => false, 'message' => $this->translate('error.already_admin')]);
 		}
 
 		$password = $parsedBody['password'] ?? '';
 		if (empty($password)) {
-			return new JsonResponse(['success' => false, 'message' => 'Password is required']);
+			return new JsonResponse(['success' => false, 'message' => $this->translate('error.password_required')]);
 		}
 
 		if (!$this->verifyPassword($backendUser, $password)) {
-			return new JsonResponse(['success' => false, 'message' => 'Invalid password']);
+			return new JsonResponse(['success' => false, 'message' => $this->translate('error.invalid_password')]);
 		}
 
 		$currentTime = time();
@@ -57,7 +69,7 @@ class ElevationController
 
 		return new JsonResponse([
 			'success' => true,
-			'message' => 'Successfully elevated to admin',
+			'message' => $this->translate('success.elevated_to_admin'),
 			'reload' => true,
 		]);
 	}
@@ -65,25 +77,25 @@ class ElevationController
 	private function leaveAdminMode(BackendUserAuthentication $backendUser): ResponseInterface
 	{
 		if (!$backendUser->isAdmin()) {
-			return new JsonResponse(['success' => false, 'message' => 'User is not admin']);
+			return new JsonResponse(['success' => false, 'message' => $this->translate('error.not_admin')]);
 		}
 
 		if (!$this->isCurrentlyElevated($backendUser)) {
-			return new JsonResponse(['success' => false, 'message' => 'Cannot leave permanent admin mode']);
+			return new JsonResponse(['success' => false, 'message' => $this->translate('error.cannot_leave_permanent')]);
 		}
 
 		$this->clearAdminElevation((int)$backendUser->user['uid']);
 
 		return new JsonResponse([
 			'success' => true,
-			'message' => 'Successfully left admin mode',
+			'message' => $this->translate('success.left_admin_mode'),
 			'reload' => true,
 		]);
 	}
 
 	private function verifyPassword(BackendUserAuthentication $backendUser, string $password): bool
 	{
-		$saltedPasswordService = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory::class);
+		$saltedPasswordService = GeneralUtility::makeInstance(PasswordHashFactory::class);
 		$hashInstance = $saltedPasswordService->getDefaultHashInstance('BE');
 
 		return $hashInstance->checkPassword($password, $backendUser->user['password']);
