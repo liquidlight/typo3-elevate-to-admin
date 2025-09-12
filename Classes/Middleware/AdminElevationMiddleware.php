@@ -2,7 +2,9 @@
 
 namespace LiquidLight\ElevateToAdmin\Middleware;
 
+use LiquidLight\ElevateToAdmin\Event\BeforeAdminElevationProcessEvent;
 use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -21,7 +23,8 @@ class AdminElevationMiddleware implements MiddlewareInterface
 	private readonly ConnectionPool $connectionPool;
 
 	public function __construct(
-		ConnectionPool $connectionPool
+		ConnectionPool $connectionPool,
+		private readonly EventDispatcherInterface $eventDispatcher
 	) {
 		$this->connectionPool = $connectionPool;
 	}
@@ -31,14 +34,21 @@ class AdminElevationMiddleware implements MiddlewareInterface
 		$backendUser = $this->getBackendUser();
 
 		if ($backendUser instanceof BackendUserAuthentication && $backendUser->user) {
-			$this->processAdminElevation($backendUser);
+			$this->processAdminElevation($backendUser, $request);
 		}
 
 		return $handler->handle($request);
 	}
 
-	private function processAdminElevation(BackendUserAuthentication $backendUser): void
+	private function processAdminElevation(BackendUserAuthentication $backendUser, ServerRequestInterface $request): void
 	{
+		$event = new BeforeAdminElevationProcessEvent($backendUser, $request);
+		$this->eventDispatcher->dispatch($event);
+
+		if ($event->shouldSkipProcessing()) {
+			return;
+		}
+
 		$this->currentUserId = (int)$backendUser->user['uid'];
 
 		if (!$backendUser->isAdmin()) {
