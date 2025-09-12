@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace LiquidLight\ElevateToAdmin\Traits;
 
+use LiquidLight\ElevateToAdmin\Constants\DatabaseConstants;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 trait AdminElevationTrait
 {
-	protected const TABLE_BE_USERS = 'be_users';
-
-	protected const FIELD_IS_POSSIBLE_ADMIN = 'tx_elevate_to_admin_is_possible_admin';
-
-	protected const FIELD_ADMIN_SINCE = 'tx_elevate_to_admin_admin_since';
 
 	protected function getBackendUser(): ?BackendUserAuthentication
 	{
@@ -24,10 +20,10 @@ trait AdminElevationTrait
 	protected function updateUserRecord(int $userId, array $fields): void
 	{
 		$connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-		$connection = $connectionPool->getConnectionForTable(self::TABLE_BE_USERS);
+		$connection = $connectionPool->getConnectionForTable(DatabaseConstants::TABLE_BE_USERS);
 
 		$connection->update(
-			self::TABLE_BE_USERS,
+			DatabaseConstants::TABLE_BE_USERS,
 			$fields,
 			['uid' => $userId]
 		);
@@ -56,14 +52,14 @@ trait AdminElevationTrait
 			return false;
 		}
 
-		return (bool)($user->user[self::FIELD_IS_POSSIBLE_ADMIN] ?? false);
+		return (bool)($user->user[DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN] ?? false);
 	}
 
 	protected function clearAdminElevation(int $userId): void
 	{
 		$this->updateUserRecordAndGlobal($userId, [
 			'admin' => 0,
-			self::FIELD_ADMIN_SINCE => 0,
+			DatabaseConstants::FIELD_ADMIN_SINCE => 0,
 		]);
 	}
 
@@ -73,8 +69,8 @@ trait AdminElevationTrait
 
 		$this->updateUserRecordAndGlobal($userId, [
 			'admin' => 1,
-			self::FIELD_ADMIN_SINCE => $timestamp,
-			self::FIELD_IS_POSSIBLE_ADMIN => 1,
+			DatabaseConstants::FIELD_ADMIN_SINCE => $timestamp,
+			DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
 		]);
 	}
 
@@ -86,7 +82,7 @@ trait AdminElevationTrait
 			return 0;
 		}
 
-		return (int)($user->user[self::FIELD_ADMIN_SINCE] ?? 0);
+		return (int)($user->user[DatabaseConstants::FIELD_ADMIN_SINCE] ?? 0);
 	}
 
 	protected function isCurrentlyElevated(?BackendUserAuthentication $user = null): bool

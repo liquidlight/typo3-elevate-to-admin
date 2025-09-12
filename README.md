@@ -59,3 +59,4 @@ services:
 
 - Allow potential admins to login when TYPO3 is locked for editors - v12+
 - TYPO3 12 & 13 compatibility
+- Add constants back to traits
