@@ -11,7 +11,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 
 class AdminElevationMiddleware implements MiddlewareInterface
 {
@@ -19,17 +18,10 @@ class AdminElevationMiddleware implements MiddlewareInterface
 
 	private const ELEVATION_TIMEOUT_MINUTES = 10;
 
-	private int $currentUserId;
-
-	private ConnectionPool $connectionPool;
-
 	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(
-		ConnectionPool $connectionPool,
-		EventDispatcherInterface $eventDispatcher
-	) {
-		$this->connectionPool = $connectionPool;
+	public function __construct(EventDispatcherInterface $eventDispatcher)
+	{
 		$this->eventDispatcher = $eventDispatcher;
 	}
 
@@ -53,32 +45,37 @@ class AdminElevationMiddleware implements MiddlewareInterface
 			return;
 		}
 
-		$this->currentUserId = (int)$backendUser->user['uid'];
-
-		$adminSince = $this->getAdminSince($backendUser);
-		$currentTime = time();
-
-		if ($backendUser->isAdmin()) {
-			// Handle different elevation states
-			if ($adminSince === 0) {
-				// User is admin but has no elevation timestamp - this means they're a permanent admin
-				// Demote them and set them as possible admin
-				$this->updateUserRecordAndGlobal($this->currentUserId, [
-					'admin' => 0,
-					DatabaseConstants::FIELD_ADMIN_SINCE => 0,
-					DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
-				]);
-			} elseif ($this->hasElevationExpired($adminSince, $currentTime)) {
-				// Elevation expired - remove admin privileges
-				$this->clearAdminElevation($this->currentUserId);
-			} else {
-				// Elevation still valid - refresh timestamp
-				$this->updateUserRecordAndGlobal($this->currentUserId, [
-					DatabaseConstants::FIELD_ADMIN_SINCE => $currentTime,
-					DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
-				]);
-			}
+		if (!$backendUser->isAdmin()) {
+			return;
 		}
+
+		$userId = (int)$backendUser->user['uid'];
+		$adminSince = $this->getAdminSince($backendUser);
+
+		if ($adminSince === 0) {
+			$this->handlePermanentAdmin($userId);
+		} elseif ($this->hasElevationExpired($adminSince, time())) {
+			$this->clearAdminElevation($userId);
+		} else {
+			$this->refreshElevationTimestamp($userId);
+		}
+	}
+
+	private function handlePermanentAdmin(int $userId): void
+	{
+		$this->updateUserRecordAndGlobal($userId, [
+			'admin' => 0,
+			DatabaseConstants::FIELD_ADMIN_SINCE => 0,
+			DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
+		]);
+	}
+
+	private function refreshElevationTimestamp(int $userId): void
+	{
+		$this->updateUserRecordAndGlobal($userId, [
+			DatabaseConstants::FIELD_ADMIN_SINCE => time(),
+			DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
+		]);
 	}
 
 	private function hasElevationExpired(int $adminSince, int $currentTime): bool
