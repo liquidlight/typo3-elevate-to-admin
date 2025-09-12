@@ -1,7 +1,10 @@
 ._*
 .DS_Store
 .vscode
+.cache
 
 vendor/
+.Build
+
 
 *GENERATED*

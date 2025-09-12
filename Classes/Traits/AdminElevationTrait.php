@@ -11,7 +11,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 trait AdminElevationTrait
 {
-
 	protected function getBackendUser(): ?BackendUserAuthentication
 	{
 		return $GLOBALS['BE_USER'] ?? null;
