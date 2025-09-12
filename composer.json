@@ -1,18 +1,28 @@
 {
     "name": "liquidlight/typo3-elevate-to-admin",
-    "type": "typo3-cms-extension",
     "description": "Allow users to elevate themselves to admin if they have permission to do so",
-    "version": "0.0.0",
-    "license": "MIT",
+    "license": "GPL-2.0+",
+    "type": "typo3-cms-extension",
+    "version": "2.2.0",
+    "readme": "./README.md",
     "authors": [
+        {
+            "name": "Liquid Light",
+            "email": "info@liquidlight.co.uk",
+            "homepage": "https://www.liquidlight.co.uk/"
+        },
         {
             "name": "Mike Street",
             "email": "mike@liquidlight.co.uk"
         }
     ],
+    "homepage": "https://github.com/liquidlight/typo3-elevate-to-admin",
+    "support": {
+        "issues": "https://github.com/liquidlight/typo3-elevate-to-admin/issues",
+        "source": "https://github.com/liquidlight/typo3-elevate-to-admin"
+    },
     "require": {
-        "typo3/cms-core": "^11.5 ",
-        "typo3/cms-backend": "^11.5"
+        "typo3/cms-core": "^11.5"
     },
     "autoload": {
         "psr-4": {

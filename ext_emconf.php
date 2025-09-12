@@ -1,8 +1,6 @@
 <?php
 
-defined('TYPO3') or die();
-
-$EM_CONF['elevate_to_admin'] = [
+$EM_CONF[$_EXTKEY] = [
 	'title' => 'Elevate to Admin',
 	'description' => 'Allow backend users to elevate themselves to admin privileges',
 	'category' => 'be',
