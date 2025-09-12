@@ -2,6 +2,7 @@
 
 namespace LiquidLight\ElevateToAdmin\Middleware;
 
+use LiquidLight\ElevateToAdmin\Constants\DatabaseConstants;
 use LiquidLight\ElevateToAdmin\Event\BeforeAdminElevationProcessEvent;
 use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -54,23 +55,29 @@ class AdminElevationMiddleware implements MiddlewareInterface
 
 		$this->currentUserId = (int)$backendUser->user['uid'];
 
-		if (!$backendUser->isAdmin()) {
-			return;
-		}
-
 		$adminSince = $this->getAdminSince($backendUser);
 		$currentTime = time();
 
-		// Handle different elevation states
-		if ($adminSince === 0 || $this->hasElevationExpired($adminSince, $currentTime)) {
-			// No elevation session or expired - remove admin privileges
-			$this->clearAdminElevation($this->currentUserId);
-		} else {
-			// Elevation still valid - refresh timestamp
-			$this->updateUserRecordAndGlobal($this->currentUserId, [
-				self::FIELD_ADMIN_SINCE => $currentTime,
-				self::FIELD_IS_POSSIBLE_ADMIN => 1,
-			]);
+		if ($backendUser->isAdmin()) {
+			// Handle different elevation states
+			if ($adminSince === 0) {
+				// User is admin but has no elevation timestamp - this means they're a permanent admin
+				// Demote them and set them as possible admin
+				$this->updateUserRecordAndGlobal($this->currentUserId, [
+					'admin' => 0,
+					DatabaseConstants::FIELD_ADMIN_SINCE => 0,
+					DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
+				]);
+			} elseif ($this->hasElevationExpired($adminSince, $currentTime)) {
+				// Elevation expired - remove admin privileges
+				$this->clearAdminElevation($this->currentUserId);
+			} else {
+				// Elevation still valid - refresh timestamp
+				$this->updateUserRecordAndGlobal($this->currentUserId, [
+					DatabaseConstants::FIELD_ADMIN_SINCE => $currentTime,
+					DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
+				]);
+			}
 		}
 	}
 
