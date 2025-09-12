@@ -58,5 +58,4 @@ services:
 ## TODO:
 
 - Allow potential admins to login when TYPO3 is locked for editors - v12+
-- PHP 7.4 compatibility
 - TYPO3 12 & 13 compatibility

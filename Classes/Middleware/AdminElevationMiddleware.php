@@ -20,13 +20,16 @@ class AdminElevationMiddleware implements MiddlewareInterface
 
 	private int $currentUserId;
 
-	private readonly ConnectionPool $connectionPool;
+	private ConnectionPool $connectionPool;
+
+	private EventDispatcherInterface $eventDispatcher;
 
 	public function __construct(
 		ConnectionPool $connectionPool,
-		private readonly EventDispatcherInterface $eventDispatcher
+		EventDispatcherInterface $eventDispatcher
 	) {
 		$this->connectionPool = $connectionPool;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
