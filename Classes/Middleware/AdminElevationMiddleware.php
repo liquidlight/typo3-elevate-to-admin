@@ -11,7 +11,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 
 class AdminElevationMiddleware implements MiddlewareInterface
 {
-	private const ELEVATION_TIMEOUT_MINUTES = 30;
+	private const ELEVATION_TIMEOUT_MINUTES = 10;
 
 	private const TABLE_BE_USERS = 'be_users';
 
