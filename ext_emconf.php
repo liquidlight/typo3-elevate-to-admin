@@ -2,7 +2,7 @@
 
 defined('TYPO3') or die();
 
-$EM_CONF[$_EXTKEY] = [
+$EM_CONF['elevate_to_admin'] = [
 	'title' => 'Elevate to Admin',
 	'description' => 'Allow backend users to elevate themselves to admin privileges',
 	'category' => 'be',
@@ -12,7 +12,7 @@ $EM_CONF[$_EXTKEY] = [
 	'version' => '0.0.0',
 	'constraints' => [
 		'depends' => [
-			'typo3' => '11.5.0-12.4.99',
+			'typo3' => '11.5.0-11.5.99',
 		],
 		'conflicts' => [],
 		'suggests' => [],
