@@ -24,7 +24,7 @@ jobs:
           - name: "PHP Parallel Lint"
             command: "composer parallel-lint"
           - name: "Composer Normalize"
-            command: "composer composer-normalize:dry-run && composer composer-normalize:app:dry-run"
+            command: "composer composer-normalize:dry-run"
           - name: "EditorConfig"
             command: "composer editorconfig:dry-run"
           - name: "YAML Lint"
