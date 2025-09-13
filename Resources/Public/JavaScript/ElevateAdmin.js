@@ -1,35 +1,31 @@
-define([
-	'TYPO3/CMS/Backend/Modal',
-	'TYPO3/CMS/Core/Ajax/AjaxRequest',
-	'TYPO3/CMS/Backend/Notification'
-], function (Modal, AjaxRequest, Notification) {
-	'use strict';
+import Modal from '@typo3/backend/modal.js';
+import AjaxRequest from '@typo3/core/ajax/ajax-request.js';
+import Notification from '@typo3/backend/notification.js';
 
-	/**
-	 * Get localized string
-	 */
-	function getLabel(key) {
-		return TYPO3.lang['elevate_to_admin.' + key] || key;
-	}
+/**
+ * Get localized string
+ */
+function getLabel(key) {
+	return TYPO3.lang['elevate_to_admin.' + key] || key;
+}
 
-	var ElevateAdmin = {
+const ElevateAdmin = {
+	initialize: function() {
+		const self = this;
 
-		initialize: function() {
-			var self = this;
-
-			if (document.readyState === 'loading') {
-				document.addEventListener('DOMContentLoaded', function() {
-					self.bindDropdownEvents();
-				});
-			} else {
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', function() {
 				self.bindDropdownEvents();
-			}
-		},
+			});
+		} else {
+			self.bindDropdownEvents();
+		}
+	},
 
-		bindDropdownEvents: function() {
-			var self = this;
-			var enterButton = document.getElementById('enter-admin-mode');
-			var leaveButton = document.getElementById('exit-admin-mode');
+	bindDropdownEvents: function() {
+		const self = this;
+		const enterButton = document.getElementById('enter-admin-mode');
+		const leaveButton = document.getElementById('exit-admin-mode');
 
 			if (enterButton) {
 				enterButton.addEventListener('click', function(e) {
@@ -53,15 +49,16 @@ define([
 		},
 
 		showPasswordModal: function() {
-			var self = this,
-				html = $(
-					'<div class="form-group">' +
-						'<label for="admin-password">' + getLabel('modal.password_label') + '</label>' +
-						'<input type="password" class="form-control" id="admin-password" placeholder="' + getLabel('modal.password_placeholder') + '" />' +
-					'</div>'
-				);
+			const self = this;
+			const htmlString =
+				'<div class="form-group">' +
+					'<label for="admin-password">' + getLabel('modal.password_label') + '</label>' +
+					'<input type="password" class="form-control" id="admin-password" placeholder="' + getLabel('modal.password_placeholder') + '" />' +
+				'</div>';
+			const html = document.createElement('div');
+			html.innerHTML = htmlString;
 
-			var modal = Modal.show(
+			const modal = Modal.show(
 				getLabel('modal.enter_admin_title'),
 				html,
 				Modal.sizes.small,
@@ -83,8 +80,9 @@ define([
 				]
 			);
 
-			modal.on('shown.bs.modal', function() {
-				var passwordField = document.getElementById('admin-password');
+			// Use setTimeout to ensure modal is rendered before focusing
+			setTimeout(function() {
+				const passwordField = document.getElementById('admin-password');
 				if (passwordField) {
 					passwordField.focus();
 					passwordField.addEventListener('keypress', function(e) {
@@ -93,12 +91,12 @@ define([
 						}
 					});
 				}
-			});
+			}, 100);
 		},
 
 		processElevation: function() {
-			var field = document.getElementById('admin-password');
-			var password = field ? field.value : '';
+			const field = document.getElementById('admin-password');
+			const password = field ? field.value : '';
 			if (!password) { Notification.error(getLabel('js.error_title'), getLabel('error.password_required')); return; }
 			new AjaxRequest(TYPO3.settings.ajaxUrls.elevate_admin).post({ password: password })
 				.then(async response => await response.resolve())
@@ -125,7 +123,7 @@ define([
 		},
 
 		processLeaveAdmin: function() {
-			var self = this;
+			const self = this;
 
 			Modal.confirm(
 				getLabel('modal.leave_admin_title'),
@@ -171,8 +169,7 @@ define([
 		}
 	};
 
-	// Initialize when loaded
-	ElevateAdmin.initialize();
+// Initialize when loaded
+ElevateAdmin.initialize();
 
-	return ElevateAdmin;
-});
+export default ElevateAdmin;

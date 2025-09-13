@@ -3,16 +3,20 @@
 	<h3 class="dropdown-headline">
 		{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.user')}
 	</h3>
-	<hr>
-
-	<ul class="modulemenu-group-container">
-		<li>
-			<a href="#" class="dropdown-table-title" id="{id}">
-				<span class="dropdown-table-icon">
-					<core:icon identifier="{icon}" />
-				</span>
-				{label}
-			</a>
-		</li>
-	</ul>
+	<nav>
+		<ul class="dropdown-list">
+			<li>
+				<a href="#" class="dropdown-item" id="{id}">
+					<span class="dropdown-item-columns">
+						<span class="dropdown-item-column dropdown-item-column-icon">
+							<core:icon identifier="{icon}" />
+						</span>
+						<span class="dropdown-item-column">
+							{label}
+						</span>
+					</span>
+				</a>
+			</li>
+		</ul>
+	</nav>
 </html>

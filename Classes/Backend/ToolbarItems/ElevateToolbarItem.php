@@ -5,20 +5,30 @@ declare(strict_types=1);
 namespace LiquidLight\ElevateToAdmin\Backend\ToolbarItems;
 
 use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
+use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Toolbar\RequestAwareToolbarItemInterface;
 use TYPO3\CMS\Backend\Toolbar\ToolbarItemInterface;
+use TYPO3\CMS\Backend\View\BackendViewFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
 
-class ElevateToolbarItem implements ToolbarItemInterface
+class ElevateToolbarItem implements ToolbarItemInterface, RequestAwareToolbarItemInterface
 {
 	use AdminElevationTrait;
 
+	private ServerRequestInterface $request;
+
 	public function __construct(
+		private readonly BackendViewFactory $backendViewFactory,
+		private readonly PageRenderer $pageRenderer,
 	) {
-		$this->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/ElevateToAdmin/ElevateAdmin');
 		$this->addJavaScriptLanguageLabels();
+	}
+
+	public function setRequest(ServerRequestInterface $request): void
+	{
+		$this->request = $request;
 	}
 
 	public function checkAccess(): bool
@@ -28,7 +38,8 @@ class ElevateToolbarItem implements ToolbarItemInterface
 
 	public function getItem(): string
 	{
-		return $this->getFluidTemplateObject('ToolbarItem.html')->render();
+		$view = $this->backendViewFactory->create($this->request, ['liquidlight/typo3-elevate-to-admin']);
+		return $view->render('ToolbarItems/ToolbarItem');
 	}
 
 	public function hasDropDown(): bool
@@ -41,9 +52,10 @@ class ElevateToolbarItem implements ToolbarItemInterface
 		if (!$this->checkAccess()) {
 			return '';
 		}
-		$view = $this->getFluidTemplateObject('ToolbarItemDropDown.html');
 
-		if ($this->getBackendUser()->isAdmin()) {
+		$view = $this->backendViewFactory->create($this->request, ['liquidlight/typo3-elevate-to-admin']);
+
+		if ($this->getBackendUser()?->isAdmin()) {
 			$view->assignMultiple([
 				'icon' => 'actions-logout',
 				'label' => $this->translate('toolbar.exit_admin_mode'),
@@ -57,7 +69,7 @@ class ElevateToolbarItem implements ToolbarItemInterface
 			]);
 		}
 
-		return $view->render();
+		return $view->render('ToolbarItems/ToolbarItemDropDown');
 	}
 
 	public function getAdditionalAttributes(): array
@@ -68,38 +80,6 @@ class ElevateToolbarItem implements ToolbarItemInterface
 	public function getIndex(): int
 	{
 		return 80;
-	}
-
-	protected function getPageRenderer(): PageRenderer
-	{
-		return GeneralUtility::makeInstance(PageRenderer::class);
-	}
-
-	/**
-	 * Returns a new standalone view, shorthand function
-	 *
-	 * @param string $filename Which templateFile should be used.
-	 */
-	protected function getFluidTemplateObject(string $filename): StandaloneView
-	{
-		$view = GeneralUtility::makeInstance(StandaloneView::class);
-		$view->setLayoutRootPaths([
-			'EXT:backend/Resources/Private/Layouts',
-			'EXT:elevate_to_admin/Resources/Private/Layouts',
-		]);
-		$view->setPartialRootPaths([
-			'EXT:backend/Resources/Private/Partials/ToolbarItems',
-			'EXT:elevate_to_admin/Resources/Private/Partials/ToolbarItems',
-		]);
-		$view->setTemplateRootPaths([
-			'EXT:elevate_to_admin/Resources/Private/Templates/ToolbarItems',
-		]);
-
-		$view->setTemplate($filename);
-
-		$view->getRequest()->setControllerExtensionName('Backend');
-
-		return $view;
 	}
 
 	private function getLanguageService(): LanguageService
@@ -138,6 +118,6 @@ class ElevateToolbarItem implements ToolbarItemInterface
 			$languageLabels['elevate_to_admin.' . $key] = $this->translate($key);
 		}
 
-		$this->getPageRenderer()->addInlineLanguageLabelArray($languageLabels);
+		$this->pageRenderer->addInlineLanguageLabelArray($languageLabels);
 	}
 }
