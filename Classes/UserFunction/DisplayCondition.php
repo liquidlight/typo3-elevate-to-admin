@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LiquidLight\ElevateToAdmin\UserFunction;
 
 use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
@@ -16,7 +18,7 @@ class DisplayCondition
 	{
 		$backendUser = $this->getBackendUser();
 
-		if (!$backendUser || !$backendUser->isAdmin()) {
+		if (!$backendUser?->isAdmin()) {
 			return false;
 		}
 
@@ -40,8 +42,6 @@ class DisplayCondition
 	 */
 	public function isAdmin(array $parameters): bool
 	{
-		$backendUser = $this->getBackendUser();
-
-		return $backendUser && $backendUser->isAdmin();
+		return $this->getBackendUser()?->isAdmin() ?? false;
 	}
 }

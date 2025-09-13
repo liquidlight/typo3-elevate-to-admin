@@ -56,7 +56,7 @@ class ElevationController
 		}
 
 		$password = $parsedBody['password'] ?? '';
-		if (empty($password)) {
+		if ($password === '') {
 			return new JsonResponse(['success' => false, 'message' => $this->translate('error.password_required')]);
 		}
 

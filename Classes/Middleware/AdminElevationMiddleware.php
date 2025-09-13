@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LiquidLight\ElevateToAdmin\Middleware;
 
-use LiquidLight\ElevateToAdmin\Constants\DatabaseConstants;
 use LiquidLight\ElevateToAdmin\Event\BeforeAdminElevationProcessEvent;
 use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -18,11 +19,9 @@ class AdminElevationMiddleware implements MiddlewareInterface
 
 	private const ELEVATION_TIMEOUT_MINUTES = 10;
 
-	private EventDispatcherInterface $eventDispatcher;
-
-	public function __construct(EventDispatcherInterface $eventDispatcher)
-	{
-		$this->eventDispatcher = $eventDispatcher;
+	public function __construct(
+		private readonly EventDispatcherInterface $eventDispatcher
+	) {
 	}
 
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -65,16 +64,16 @@ class AdminElevationMiddleware implements MiddlewareInterface
 	{
 		$this->updateUserRecordAndGlobal($userId, [
 			'admin' => 0,
-			DatabaseConstants::FIELD_ADMIN_SINCE => 0,
-			DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
+			self::FIELD_ADMIN_SINCE => 0,
+			self::FIELD_IS_POSSIBLE_ADMIN => 1,
 		]);
 	}
 
 	private function refreshElevationTimestamp(int $userId): void
 	{
 		$this->updateUserRecordAndGlobal($userId, [
-			DatabaseConstants::FIELD_ADMIN_SINCE => time(),
-			DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
+			self::FIELD_ADMIN_SINCE => time(),
+			self::FIELD_IS_POSSIBLE_ADMIN => 1,
 		]);
 	}
 

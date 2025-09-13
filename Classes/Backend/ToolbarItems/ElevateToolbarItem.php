@@ -70,7 +70,7 @@ class ElevateToolbarItem implements ToolbarItemInterface
 		return 80;
 	}
 
-	protected function getPageRenderer()
+	protected function getPageRenderer(): PageRenderer
 	{
 		return GeneralUtility::makeInstance(PageRenderer::class);
 	}

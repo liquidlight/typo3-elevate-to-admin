@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace LiquidLight\ElevateToAdmin\Tests\Functional\Traits;
 
-use LiquidLight\ElevateToAdmin\Constants\DatabaseConstants;
 use LiquidLight\ElevateToAdmin\Tests\Functional\FunctionalTestCase;
 use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -32,32 +31,32 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 	{
 		$fields = [
 			'admin' => 1,
-			DatabaseConstants::FIELD_ADMIN_SINCE => time(),
+			'tx_elevate_to_admin_admin_since' => time(),
 		];
 
 		$this->updateUserRecord($this->testUserId, $fields);
 
-		$record = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$record = $this->getDatabaseRecord('be_users', [
 			'uid' => $this->testUserId,
 		]);
 
 		$this->assertNotNull($record);
 		$this->assertEquals(1, $record['admin']);
-		$this->assertGreaterThan(0, $record[DatabaseConstants::FIELD_ADMIN_SINCE]);
+		$this->assertGreaterThan(0, $record['tx_elevate_to_admin_admin_since']);
 	}
 
 	public function testClearAdminElevationUpdatesDatabase(): void
 	{
 		// First set admin status
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-			->getConnectionForTable(DatabaseConstants::TABLE_BE_USERS)
+			->getConnectionForTable('be_users')
 		;
 
 		$connection->update(
-			DatabaseConstants::TABLE_BE_USERS,
+			'be_users',
 			[
 				'admin' => 1,
-				DatabaseConstants::FIELD_ADMIN_SINCE => time(),
+				'tx_elevate_to_admin_admin_since' => time(),
 			],
 			['uid' => $this->testUserId]
 		);
@@ -66,7 +65,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 		$backendUser = $this->createBackendUser([
 			'uid' => $this->testUserId,
 			'admin' => 1,
-			DatabaseConstants::FIELD_ADMIN_SINCE => time(),
+			'tx_elevate_to_admin_admin_since' => time(),
 		]);
 		$this->setGlobalBackendUser($backendUser);
 
@@ -74,13 +73,13 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 		$this->clearAdminElevation($this->testUserId);
 
 		// Verify database state
-		$record = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$record = $this->getDatabaseRecord('be_users', [
 			'uid' => $this->testUserId,
 		]);
 
 		$this->assertNotNull($record);
 		$this->assertEquals(0, $record['admin']);
-		$this->assertEquals(0, $record[DatabaseConstants::FIELD_ADMIN_SINCE]);
+		$this->assertEquals(0, $record['tx_elevate_to_admin_admin_since']);
 	}
 
 	public function testSetAdminElevationUpdatesDatabase(): void
@@ -95,14 +94,14 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 
 		$this->setAdminElevation($this->testUserId, $timestamp);
 
-		$record = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$record = $this->getDatabaseRecord('be_users', [
 			'uid' => $this->testUserId,
 		]);
 
 		$this->assertNotNull($record);
 		$this->assertEquals(1, $record['admin']);
-		$this->assertEquals($timestamp, $record[DatabaseConstants::FIELD_ADMIN_SINCE]);
-		$this->assertEquals(1, $record[DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN]);
+		$this->assertEquals($timestamp, $record['tx_elevate_to_admin_admin_since']);
+		$this->assertEquals(1, $record['tx_elevate_to_admin_is_possible_admin']);
 	}
 
 	public function testSetAdminElevationWithCurrentTimestamp(): void
@@ -118,15 +117,15 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 
 		$afterTime = time();
 
-		$record = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$record = $this->getDatabaseRecord('be_users', [
 			'uid' => $this->testUserId,
 		]);
 
 		$this->assertNotNull($record);
 		$this->assertEquals(1, $record['admin']);
-		$this->assertGreaterThanOrEqual($beforeTime, $record[DatabaseConstants::FIELD_ADMIN_SINCE]);
-		$this->assertLessThanOrEqual($afterTime, $record[DatabaseConstants::FIELD_ADMIN_SINCE]);
-		$this->assertEquals(1, $record[DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN]);
+		$this->assertGreaterThanOrEqual($beforeTime, $record['tx_elevate_to_admin_admin_since']);
+		$this->assertLessThanOrEqual($afterTime, $record['tx_elevate_to_admin_admin_since']);
+		$this->assertEquals(1, $record['tx_elevate_to_admin_is_possible_admin']);
 	}
 
 	public function testCanUserElevateWithDatabaseData(): void
@@ -134,7 +133,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 		// Test user with elevation permission
 		$backendUser = $this->createBackendUser([
 			'uid' => $this->testUserId,
-			DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
+			'tx_elevate_to_admin_is_possible_admin' => 1,
 		]);
 
 		$result = $this->canUserElevate($backendUser);
@@ -143,7 +142,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 		// Test user without elevation permission
 		$backendUserNoPermission = $this->createBackendUser([
 			'uid' => $this->testUserId + 1,
-			DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 0,
+			'tx_elevate_to_admin_is_possible_admin' => 0,
 		]);
 
 		$result = $this->canUserElevate($backendUserNoPermission);
@@ -160,35 +159,35 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 
 		$fields = [
 			'admin' => 1,
-			DatabaseConstants::FIELD_ADMIN_SINCE => time(),
+			'tx_elevate_to_admin_admin_since' => time(),
 		];
 
 		$this->updateUserRecordAndGlobal($this->testUserId, $fields);
 
 		// Check database was updated
-		$record = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$record = $this->getDatabaseRecord('be_users', [
 			'uid' => $this->testUserId,
 		]);
 		$this->assertEquals(1, $record['admin']);
 
 		// Check global user data was updated
 		$this->assertEquals(1, $GLOBALS['BE_USER']->user['admin']);
-		$this->assertEquals($fields[DatabaseConstants::FIELD_ADMIN_SINCE], $GLOBALS['BE_USER']->user[DatabaseConstants::FIELD_ADMIN_SINCE]);
+		$this->assertEquals($fields['tx_elevate_to_admin_admin_since'], $GLOBALS['BE_USER']->user['tx_elevate_to_admin_admin_since']);
 	}
 
 	private function createTestUser(): void
 	{
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-			->getConnectionForTable(DatabaseConstants::TABLE_BE_USERS)
+			->getConnectionForTable('be_users')
 		;
 
-		$connection->insert(DatabaseConstants::TABLE_BE_USERS, [
+		$connection->insert('be_users', [
 			'uid' => $this->testUserId,
 			'username' => 'functional_test_user',
 			'password' => '$argon2i$v=19$m=65536,t=16,p=1$test',
 			'admin' => 0,
-			DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
-			DatabaseConstants::FIELD_ADMIN_SINCE => 0,
+			'tx_elevate_to_admin_is_possible_admin' => 1,
+			'tx_elevate_to_admin_admin_since' => 0,
 			'tstamp' => time(),
 			'crdate' => time(),
 		]);
@@ -197,10 +196,10 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 	private function cleanupTestUser(): void
 	{
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-			->getConnectionForTable(DatabaseConstants::TABLE_BE_USERS)
+			->getConnectionForTable('be_users')
 		;
 
-		$connection->delete(DatabaseConstants::TABLE_BE_USERS, [
+		$connection->delete('be_users', [
 			'uid' => $this->testUserId,
 		]);
 	}

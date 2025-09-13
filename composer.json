@@ -22,6 +22,7 @@
         "source": "https://github.com/liquidlight/typo3-elevate-to-admin"
     },
     "require": {
+        "php": "^8.2",
         "typo3/cms-core": "^12.4"
     },
     "require-dev": {

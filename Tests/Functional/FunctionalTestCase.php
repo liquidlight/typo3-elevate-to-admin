@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace LiquidLight\ElevateToAdmin\Tests\Functional;
 
-use LiquidLight\ElevateToAdmin\Constants\DatabaseConstants;
 use PHPUnit\Framework\TestCase;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
@@ -119,11 +118,11 @@ abstract class FunctionalTestCase extends TestCase
 	protected function setUpDatabase(): void
 	{
 		try {
-			$connection = $this->connectionPool->getConnectionForTable(DatabaseConstants::TABLE_BE_USERS);
+			$connection = $this->connectionPool->getConnectionForTable('be_users');
 
 			// Create be_users table if it doesn't exist
 			$schemaManager = $connection->createSchemaManager();
-			if (!$schemaManager->tablesExist([DatabaseConstants::TABLE_BE_USERS])) {
+			if (!$schemaManager->tablesExist(['be_users'])) {
 				$this->createBeUsersTable($connection);
 			}
 
@@ -139,13 +138,13 @@ abstract class FunctionalTestCase extends TestCase
 	protected function createBeUsersTable($connection): void
 	{
 		$sql = "
-			CREATE TABLE " . DatabaseConstants::TABLE_BE_USERS . " (
+			CREATE TABLE " . 'be_users' . " (
 				uid INTEGER PRIMARY KEY,
 				username VARCHAR(255) NOT NULL DEFAULT '',
 				password VARCHAR(255) NOT NULL DEFAULT '',
 				admin TINYINT(1) NOT NULL DEFAULT 0,
-				" . DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN . " TINYINT(1) NOT NULL DEFAULT 0,
-				" . DatabaseConstants::FIELD_ADMIN_SINCE . " INTEGER NOT NULL DEFAULT 0,
+				" . 'tx_elevate_to_admin_is_possible_admin' . " TINYINT(1) NOT NULL DEFAULT 0,
+				" . 'tx_elevate_to_admin_admin_since' . " INTEGER NOT NULL DEFAULT 0,
 				tstamp INTEGER NOT NULL DEFAULT 0,
 				crdate INTEGER NOT NULL DEFAULT 0,
 				deleted TINYINT(1) NOT NULL DEFAULT 0
@@ -169,8 +168,8 @@ abstract class FunctionalTestCase extends TestCase
 			'TSconfig' => '',
 			'workspace_id' => 0,
 			'workspace_perms' => 1,
-			DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
-			DatabaseConstants::FIELD_ADMIN_SINCE => 0,
+			'tx_elevate_to_admin_is_possible_admin' => 1,
+			'tx_elevate_to_admin_admin_since' => 0,
 			'tstamp' => time(),
 			'crdate' => time(),
 		];

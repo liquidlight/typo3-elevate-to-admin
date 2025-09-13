@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace LiquidLight\ElevateToAdmin\Tests\Functional\Controller;
 
-use LiquidLight\ElevateToAdmin\Constants\DatabaseConstants;
 use LiquidLight\ElevateToAdmin\Controller\ElevationController;
 use LiquidLight\ElevateToAdmin\Tests\Functional\FunctionalTestCase;
+use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\JsonResponse;
@@ -15,6 +15,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ElevationControllerFunctionalTest extends FunctionalTestCase
 {
+	use AdminElevationTrait;
+
 	private ElevationController $subject;
 
 	private int $testUserId = 998;
@@ -36,7 +38,7 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 	public function testElevateActionSucceedsWithIntegration(): void
 	{
 		// Create backend user with database data
-		$userData = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$userData = $this->getDatabaseRecord(self::TABLE_BE_USERS, [
 			'uid' => $this->testUserId,
 		]);
 
@@ -64,17 +66,11 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 	public function testElevateActionHandlesUserWithoutPermission(): void
 	{
 		// Update user to not have elevation permission
-		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-			->getConnectionForTable(DatabaseConstants::TABLE_BE_USERS)
-		;
+		$this->updateUserRecord($this->testUserId, [
+			self::FIELD_IS_POSSIBLE_ADMIN => 0,
+		]);
 
-		$connection->update(
-			DatabaseConstants::TABLE_BE_USERS,
-			[DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 0],
-			['uid' => $this->testUserId]
-		);
-
-		$userData = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$userData = $this->getDatabaseRecord(self::TABLE_BE_USERS, [
 			'uid' => $this->testUserId,
 		]);
 
@@ -99,20 +95,9 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 	{
 		// Set user as elevated admin in database
 		$timestamp = time();
-		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-			->getConnectionForTable(DatabaseConstants::TABLE_BE_USERS)
-		;
+		$this->setAdminElevation($this->testUserId, $timestamp);
 
-		$connection->update(
-			DatabaseConstants::TABLE_BE_USERS,
-			[
-				'admin' => 1,
-				DatabaseConstants::FIELD_ADMIN_SINCE => $timestamp,
-			],
-			['uid' => $this->testUserId]
-		);
-
-		$userData = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$userData = $this->getDatabaseRecord(self::TABLE_BE_USERS, [
 			'uid' => $this->testUserId,
 		]);
 
@@ -143,28 +128,20 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 		$this->assertStringStartsWith('translated_', $responseData['message']);
 
 		// Verify database changes
-		$updatedRecord = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$updatedRecord = $this->getDatabaseRecord(self::TABLE_BE_USERS, [
 			'uid' => $this->testUserId,
 		]);
 
 		$this->assertEquals(0, $updatedRecord['admin']);
-		$this->assertEquals(0, $updatedRecord[DatabaseConstants::FIELD_ADMIN_SINCE]);
+		$this->assertEquals(0, $updatedRecord[self::FIELD_ADMIN_SINCE]);
 	}
 
 	public function testElevateActionRejectsAlreadyAdminUser(): void
 	{
 		// Set user as admin in database
-		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-			->getConnectionForTable(DatabaseConstants::TABLE_BE_USERS)
-		;
+		$this->updateUserRecord($this->testUserId, ['admin' => 1]);
 
-		$connection->update(
-			DatabaseConstants::TABLE_BE_USERS,
-			['admin' => 1],
-			['uid' => $this->testUserId]
-		);
-
-		$userData = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$userData = $this->getDatabaseRecord(self::TABLE_BE_USERS, [
 			'uid' => $this->testUserId,
 		]);
 
@@ -196,7 +173,7 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 
 	public function testControllerPreservesUserDataIntegrity(): void
 	{
-		$originalUserData = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$originalUserData = $this->getDatabaseRecord(self::TABLE_BE_USERS, [
 			'uid' => $this->testUserId,
 		]);
 
@@ -214,29 +191,29 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 		$this->assertFalse($responseData['success']);
 
 		// Verify user data was not modified
-		$currentUserData = $this->getDatabaseRecord(DatabaseConstants::TABLE_BE_USERS, [
+		$currentUserData = $this->getDatabaseRecord(self::TABLE_BE_USERS, [
 			'uid' => $this->testUserId,
 		]);
 
 		$this->assertEquals($originalUserData['admin'], $currentUserData['admin']);
-		$this->assertEquals($originalUserData[DatabaseConstants::FIELD_ADMIN_SINCE], $currentUserData[DatabaseConstants::FIELD_ADMIN_SINCE]);
+		$this->assertEquals($originalUserData[self::FIELD_ADMIN_SINCE], $currentUserData[self::FIELD_ADMIN_SINCE]);
 	}
 
 	private function createTestUser(): void
 	{
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-			->getConnectionForTable(DatabaseConstants::TABLE_BE_USERS)
+			->getConnectionForTable(self::TABLE_BE_USERS)
 		;
 
 		$hashedPassword = '$argon2i$v=19$m=65536,t=16,p=1$test'; // Pre-hashed test password
 
-		$connection->insert(DatabaseConstants::TABLE_BE_USERS, [
+		$connection->insert(self::TABLE_BE_USERS, [
 			'uid' => $this->testUserId,
 			'username' => 'elevation_test_user',
 			'password' => $hashedPassword,
 			'admin' => 0,
-			DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN => 1,
-			DatabaseConstants::FIELD_ADMIN_SINCE => 0,
+			self::FIELD_IS_POSSIBLE_ADMIN => 1,
+			self::FIELD_ADMIN_SINCE => 0,
 			'tstamp' => time(),
 			'crdate' => time(),
 		]);
@@ -245,10 +222,10 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 	private function cleanupTestUser(): void
 	{
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-			->getConnectionForTable(DatabaseConstants::TABLE_BE_USERS)
+			->getConnectionForTable(self::TABLE_BE_USERS)
 		;
 
-		$connection->delete(DatabaseConstants::TABLE_BE_USERS, [
+		$connection->delete(self::TABLE_BE_USERS, [
 			'uid' => $this->testUserId,
 		]);
 	}

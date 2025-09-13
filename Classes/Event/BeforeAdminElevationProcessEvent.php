@@ -11,16 +11,10 @@ final class BeforeAdminElevationProcessEvent
 {
 	private bool $skipProcessing = false;
 
-	private BackendUserAuthentication $backendUser;
-
-	private ServerRequestInterface $request;
-
 	public function __construct(
-		BackendUserAuthentication $backendUser,
-		ServerRequestInterface $request
+		private readonly BackendUserAuthentication $backendUser,
+		private readonly ServerRequestInterface $request
 	) {
-		$this->backendUser = $backendUser;
-		$this->request = $request;
 	}
 
 	public function getBackendUser(): BackendUserAuthentication
