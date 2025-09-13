@@ -36,6 +36,11 @@
             "LiquidLight\\ElevateToAdmin\\": "Classes"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "LiquidLight\\ElevateToAdmin\\Tests\\": "Tests"
+        }
+    },
     "config": {
         "allow-plugins": {
             "ergebnis/composer-normalize": true,
@@ -70,7 +75,12 @@
         "parallel-lint": "parallel-lint ./ --exclude ./.Build",
         "php-cs-fixer:dry-run": "@php-cs-fixer:fix --dry-run",
         "php-cs-fixer:fix": "php-cs-fixer fix --config .Build/vendor/lintkit/php-coding-standards-config/.php-cs-fixer.php -v --diff",
-        "test-unit": "phpunit --no-coverage",
+        "test": [
+            "@test-unit",
+            "@test-functional"
+        ],
+        "test-functional": "phpunit --no-coverage --testsuite=\"Functional tests\"",
+        "test-unit": "phpunit --no-coverage --testsuite=\"Unit tests\"",
         "yaml-lint": "yaml-lint ./Configuration"
     }
 }

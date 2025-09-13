@@ -23,6 +23,9 @@
 		<testsuite name="Unit tests">
 			<directory>Tests/Unit</directory>
 		</testsuite>
+		<testsuite name="Functional tests">
+			<directory>Tests/Functional</directory>
+		</testsuite>
 	</testsuites>
 	<coverage
 		cacheDirectory=".Build/.phpunit.cache"

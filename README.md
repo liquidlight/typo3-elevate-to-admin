@@ -55,6 +55,43 @@ services:
         event: LiquidLight\ElevateToAdmin\Event\BeforeAdminElevationProcessEvent
 ```
 
+## Testing
+
+This extension includes comprehensive unit and functional tests with database integration.
+
+### Quick Testing
+
+Run tests using the unified test runner:
+
+```bash
+# Run functional tests (default)
+./run-tests
+
+# Run unit tests
+./run-tests -s unit
+
+# Run all tests
+./run-tests -s all
+
+# Run with verbose output
+./run-tests -v
+```
+
+### Alternative Methods
+
+**Direct PHPUnit:**
+```bash
+.Build/vendor/bin/phpunit --testsuite="Functional tests"
+.Build/vendor/bin/phpunit --testsuite="Unit tests"
+```
+
+### Test Database
+
+Functional tests use:
+- **SQLite in-memory** (default) - Fast, isolated
+- **DDev MySQL** - When using DDev commands
+- **Environment variables** - For CI/custom setups
+
 ## TODO:
 
 - Allow potential admins to login when TYPO3 is locked for editors - v12+
