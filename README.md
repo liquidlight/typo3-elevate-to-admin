@@ -91,9 +91,3 @@ Functional tests use:
 - **SQLite in-memory** (default) - Fast, isolated
 - **DDev MySQL** - When using DDev commands
 - **Environment variables** - For CI/custom setups
-
-## TODO:
-
-- Allow potential admins to login when TYPO3 is locked for editors - v12+
-- TYPO3 12 & 13 compatibility
-- Add constants back to traits
