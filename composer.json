@@ -23,7 +23,7 @@
     },
     "require": {
         "php": "^8.2",
-        "typo3/cms-core": "^12.4"
+        "typo3/cms-core": "^12.4 || ^13.4"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.48",
