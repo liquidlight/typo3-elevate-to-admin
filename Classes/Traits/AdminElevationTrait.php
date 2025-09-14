@@ -35,7 +35,7 @@ trait AdminElevationTrait
 
 	protected function updateGlobalUserData(int $userId, array $fields): void
 	{
-		if ($GLOBALS['BE_USER']->user['uid'] === $userId) {
+		if (isset($GLOBALS['BE_USER']) && $GLOBALS['BE_USER']->user['uid'] === $userId) {
 			foreach ($fields as $field => $value) {
 				$GLOBALS['BE_USER']->user[$field] = $value;
 			}
