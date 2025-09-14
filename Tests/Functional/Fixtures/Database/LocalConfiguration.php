@@ -79,6 +79,9 @@ return [
 				'rootline' => [
 					'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend',
 				],
+				'database_schema' => [
+					'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend',
+				],
 			],
 		],
 		'devIPmask' => '*',

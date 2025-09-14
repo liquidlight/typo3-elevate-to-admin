@@ -108,6 +108,14 @@ abstract class FunctionalTestCase extends TestCase
 			$GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['password'] = getenv('typo3DatabasePassword');
 		}
 
+		// Initialize the cache system
+		try {
+			$cacheManager = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class);
+			$cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
+		} catch (\Exception $e) {
+			// If cache manager fails to initialize, continue without it for testing
+		}
+
 		// Initialize minimal backend user for testing
 		$GLOBALS['BE_USER'] = null;
 	}
