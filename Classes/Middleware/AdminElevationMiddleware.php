@@ -11,6 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 
 class AdminElevationMiddleware implements MiddlewareInterface
@@ -20,7 +21,8 @@ class AdminElevationMiddleware implements MiddlewareInterface
 	private const ELEVATION_TIMEOUT_MINUTES = 10;
 
 	public function __construct(
-		private readonly EventDispatcherInterface $eventDispatcher
+		private readonly EventDispatcherInterface $eventDispatcher,
+		private readonly LoggerInterface $logger,
 	) {
 	}
 
@@ -52,33 +54,48 @@ class AdminElevationMiddleware implements MiddlewareInterface
 		$adminSince = $this->getAdminSince($backendUser);
 
 		if ($adminSince === 0) {
-			$this->handlePermanentAdmin($userId);
+			$this->handlePossibleElevatedAdmin($userId);
 		} elseif ($this->hasElevationExpired($adminSince, time())) {
 			$this->clearAdminElevation($userId);
+			$this->logger->info('Admin elevation expired', $this->createLogContext(['user_id' => $userId]));
 		} else {
-			$this->refreshElevationTimestamp($userId);
+			$currentTime = time();
+			if ($this->shouldRefreshTimestamp($adminSince, $currentTime)) {
+				$this->refreshElevationTimestamp($userId);
+			}
 		}
 	}
 
-	private function handlePermanentAdmin(int $userId): void
+	private function handlePossibleElevatedAdmin(int $userId): void
 	{
 		$this->updateUserRecordAndGlobal($userId, [
 			'admin' => 0,
 			self::FIELD_ADMIN_SINCE => 0,
 			self::FIELD_IS_POSSIBLE_ADMIN => 1,
 		]);
+		$this->logger->info('Admin user reverted to non-admin status', $this->createLogContext(['user_id' => $userId]));
 	}
 
 	private function refreshElevationTimestamp(int $userId): void
 	{
-		$this->updateUserRecordAndGlobal($userId, [
-			self::FIELD_ADMIN_SINCE => time(),
-			self::FIELD_IS_POSSIBLE_ADMIN => 1,
-		]);
+		try {
+			$this->updateUserRecordAndGlobal($userId, [
+				self::FIELD_ADMIN_SINCE => time(),
+				self::FIELD_IS_POSSIBLE_ADMIN => 1,
+			]);
+		} catch (\Exception $e) {
+			$this->logger->error('Failed to refresh elevation timestamp', $this->createLogContext(['user_id' => $userId, 'error' => $e->getMessage()]));
+		}
 	}
 
 	private function hasElevationExpired(int $adminSince, int $currentTime): bool
 	{
 		return ($currentTime - $adminSince) > (self::ELEVATION_TIMEOUT_MINUTES * 60);
+	}
+
+	private function shouldRefreshTimestamp(int $adminSince, int $currentTime): bool
+	{
+		$halfwayPoint = self::ELEVATION_TIMEOUT_MINUTES * 30;
+		return ($currentTime - $adminSince) > $halfwayPoint;
 	}
 }

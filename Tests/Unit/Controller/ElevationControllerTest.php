@@ -7,6 +7,7 @@ namespace LiquidLight\ElevateToAdmin\Tests\Unit\Controller;
 use LiquidLight\ElevateToAdmin\Controller\ElevationController;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Crypto\PasswordHashing\Argon2iPasswordHash;
 use TYPO3\CMS\Core\Crypto\PasswordHashing\BcryptPasswordHash;
@@ -31,6 +32,8 @@ class ElevationControllerTest extends TestCase
 
 	private $connectionPoolMock;
 
+	private $loggerMock;
+
 	protected function setUp(): void
 	{
 		parent::setUp();
@@ -49,7 +52,8 @@ class ElevationControllerTest extends TestCase
 			'options' => [],
 		];
 
-		$this->subject = new ElevationController();
+		$this->loggerMock = $this->createMock(LoggerInterface::class);
+		$this->subject = new ElevationController($this->loggerMock);
 		$this->backendUserMock = $this->createMock(BackendUserAuthentication::class);
 		$this->requestMock = $this->createMock(ServerRequestInterface::class);
 		$this->languageServiceMock = $this->createMock(LanguageService::class);

@@ -8,6 +8,7 @@ use LiquidLight\ElevateToAdmin\Controller\ElevationController;
 use LiquidLight\ElevateToAdmin\Tests\Functional\FunctionalTestCase;
 use LiquidLight\ElevateToAdmin\Traits\AdminElevationTrait;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Http\ServerRequest;
@@ -24,7 +25,8 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->subject = new ElevationController();
+		$loggerMock = $this->createMock(LoggerInterface::class);
+		$this->subject = new ElevationController($loggerMock);
 		$this->setGlobalLanguageService();
 		$this->createTestUser();
 	}
