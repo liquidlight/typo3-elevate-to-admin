@@ -22,12 +22,13 @@ return [
 				'charset' => 'utf8mb4',
 				'driver' => 'pdo_sqlite',
 				'path' => ':memory:',
-				'tableoptions' => [
+				'defaultTableOptions' => [
 					'charset' => 'utf8mb4',
-					'collate' => 'utf8mb4_unicode_ci',
+					'collation' => 'utf8mb4_unicode_ci',
 				],
 			],
 		],
+		'additionalQueryRestrictions' => [],
 	],
 	'EXTENSIONS' => [
 		'elevate_to_admin' => [
