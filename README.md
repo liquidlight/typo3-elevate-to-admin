@@ -68,35 +68,20 @@ services:
 
 This extension includes comprehensive unit and functional tests with database integration.
 
-### Quick Testing
+### Unit Tests
 
-Run tests using the unified test runner:
+Unit tests can be run with
 
-```bash
-# Run functional tests (default)
-./run-tests
-
-# Run unit tests
-./run-tests -s unit
-
-# Run all tests
-./run-tests -s all
-
-# Run with verbose output
-./run-tests -v
+```
+composer i
+composer test-unit
 ```
 
-### Alternative Methods
+### Functional Tests
 
-**Direct PHPUnit:**
-```bash
-.Build/vendor/bin/phpunit --testsuite="Functional tests"
-.Build/vendor/bin/phpunit --testsuite="Unit tests"
+Unit tests can be run with
+
 ```
-
-### Test Database
-
-Functional tests use:
-- **SQLite in-memory** (default) - Fast, isolated
-- **DDev MySQL** - When using DDev commands
-- **Environment variables** - For CI/custom setups
+composer i
+composer test-functional
+```
