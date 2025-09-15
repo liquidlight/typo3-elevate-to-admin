@@ -82,11 +82,15 @@ abstract class FunctionalTestCase extends TestCase
 			'charset' => 'utf8mb4',
 			'driver' => 'pdo_sqlite',
 			'path' => ':memory:',
-			'tableoptions' => [
+			'defaultTableOptions' => [
 				'charset' => 'utf8mb4',
-				'collate' => 'utf8mb4_unicode_ci',
+				'collation' => 'utf8mb4_unicode_ci',
 			],
 		];
+
+		// Add required middleware configuration for TYPO3 v13
+		$GLOBALS['TYPO3_CONF_VARS']['DB']['additionalQueryRestrictions'] = [];
+		$GLOBALS['TYPO3_CONF_VARS']['DB']['driverMiddlewares'] = [];
 
 		// Override with environment variables if set (for CI/Docker)
 		if (getenv('typo3DatabaseDriver')) {
@@ -126,6 +130,13 @@ abstract class FunctionalTestCase extends TestCase
 	protected function setUpDatabase(): void
 	{
 		try {
+			// Register required service for TYPO3 v13 compatibility
+			$dependencyOrderingService = new \TYPO3\CMS\Core\Service\DependencyOrderingService();
+			GeneralUtility::addInstance(
+				\TYPO3\CMS\Core\Database\DriverMiddlewareService::class,
+				new \TYPO3\CMS\Core\Database\DriverMiddlewareService($dependencyOrderingService)
+			);
+
 			$connection = $this->connectionPool->getConnectionForTable('be_users');
 
 			// Create be_users table if it doesn't exist

@@ -8,8 +8,9 @@ use LiquidLight\ElevateToAdmin\Controller\ElevationController;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Crypto\PasswordHashing\Argon2iPasswordHash;
+use TYPO3\CMS\Core\Crypto\PasswordHashing\BcryptPasswordHash;
 use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
-use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashInterface;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\JsonResponse;
@@ -30,13 +31,23 @@ class ElevationControllerTest extends TestCase
 
 	private $connectionPoolMock;
 
-	private $passwordHashFactoryMock;
-
-	private $passwordHashMock;
-
 	protected function setUp(): void
 	{
 		parent::setUp();
+
+		// Set up minimal TYPO3 configuration for password hashing
+		$GLOBALS['TYPO3_CONF_VARS']['SYS']['availablePasswordHashAlgorithms'] = [
+			Argon2iPasswordHash::class,
+			BcryptPasswordHash::class,
+		];
+		$GLOBALS['TYPO3_CONF_VARS']['BE']['passwordHashing'] = [
+			'className' => Argon2iPasswordHash::class,
+			'options' => [],
+		];
+		$GLOBALS['TYPO3_CONF_VARS']['FE']['passwordHashing'] = [
+			'className' => Argon2iPasswordHash::class,
+			'options' => [],
+		];
 
 		$this->subject = new ElevationController();
 		$this->backendUserMock = $this->createMock(BackendUserAuthentication::class);
@@ -44,22 +55,13 @@ class ElevationControllerTest extends TestCase
 		$this->languageServiceMock = $this->createMock(LanguageService::class);
 		$this->connectionMock = $this->createMock(Connection::class);
 		$this->connectionPoolMock = $this->createMock(ConnectionPool::class);
-		$this->passwordHashFactoryMock = $this->createMock(PasswordHashFactory::class);
-		$this->passwordHashMock = $this->createMock(PasswordHashInterface::class);
 
 		$this->connectionPoolMock
 			->method('getConnectionForTable')
 			->willReturn($this->connectionMock)
 		;
 
-		$this->passwordHashFactoryMock
-			->method('getDefaultHashInstance')
-			->with('BE')
-			->willReturn($this->passwordHashMock)
-		;
-
 		GeneralUtility::addInstance(ConnectionPool::class, $this->connectionPoolMock);
-		GeneralUtility::addInstance(PasswordHashFactory::class, $this->passwordHashFactoryMock);
 
 		$GLOBALS['LANG'] = $this->languageServiceMock;
 
@@ -73,7 +75,7 @@ class ElevationControllerTest extends TestCase
 
 	protected function tearDown(): void
 	{
-		unset($GLOBALS['BE_USER'], $GLOBALS['LANG']);
+		unset($GLOBALS['BE_USER'], $GLOBALS['LANG'], $GLOBALS['TYPO3_CONF_VARS']);
 		GeneralUtility::purgeInstances();
 		parent::tearDown();
 	}
@@ -183,19 +185,19 @@ class ElevationControllerTest extends TestCase
 	public function testElevateActionReturnsErrorWhenPasswordInvalid(): void
 	{
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
+
+		// Create a real hashed password using TYPO3's password hashing
+		$passwordHashFactory = new PasswordHashFactory();
+		$hasher = $passwordHashFactory->getDefaultHashInstance('BE');
+		$hashedPassword = $hasher->getHashedPassword('correct_password');
+
 		$this->backendUserMock->user = [
 			'tx_elevate_to_admin_is_possible_admin' => 1,
-			'password' => 'hashed_password',
+			'password' => $hashedPassword,
 		];
 
 		$this->backendUserMock
 			->method('isAdmin')
-			->willReturn(false)
-		;
-
-		$this->passwordHashMock
-			->method('checkPassword')
-			->with('wrong_password', 'hashed_password')
 			->willReturn(false)
 		;
 
@@ -215,21 +217,21 @@ class ElevationControllerTest extends TestCase
 	public function testElevateActionSucceedsWithValidPassword(): void
 	{
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
+
+		// Create a real hashed password using TYPO3's password hashing
+		$passwordHashFactory = new PasswordHashFactory();
+		$hasher = $passwordHashFactory->getDefaultHashInstance('BE');
+		$hashedPassword = $hasher->getHashedPassword('correct_password');
+
 		$this->backendUserMock->user = [
 			'uid' => 123,
 			'tx_elevate_to_admin_is_possible_admin' => 1,
-			'password' => 'hashed_password',
+			'password' => $hashedPassword,
 		];
 
 		$this->backendUserMock
 			->method('isAdmin')
 			->willReturn(false)
-		;
-
-		$this->passwordHashMock
-			->method('checkPassword')
-			->with('correct_password', 'hashed_password')
-			->willReturn(true)
 		;
 
 		$this->requestMock
