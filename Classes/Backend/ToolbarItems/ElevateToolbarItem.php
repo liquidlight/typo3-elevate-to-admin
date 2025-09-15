@@ -115,7 +115,8 @@ class ElevateToolbarItem implements ToolbarItemInterface, RequestAwareToolbarIte
 
 		$languageLabels = [];
 		foreach ($labels as $key) {
-			$languageLabels['elevate_to_admin.' . $key] = $this->translate($key);
+			$translatedValue = $this->translate($key);
+			$languageLabels['elevate_to_admin.' . $key] = htmlspecialchars($translatedValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 		}
 
 		$this->pageRenderer->addInlineLanguageLabelArray($languageLabels);

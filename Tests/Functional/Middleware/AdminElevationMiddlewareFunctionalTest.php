@@ -10,6 +10,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
@@ -32,7 +33,8 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 		$this->eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
 		$this->eventDispatcherMock->method('dispatch')->willReturnArgument(0);
 
-		$this->subject = new AdminElevationMiddleware($this->eventDispatcherMock);
+		$loggerMock = $this->createMock(LoggerInterface::class);
+		$this->subject = new AdminElevationMiddleware($this->eventDispatcherMock, $loggerMock);
 
 		$this->requestHandlerMock = $this->createMock(RequestHandlerInterface::class);
 		$this->requestHandlerMock->method('handle')->willReturn(new Response());
@@ -143,7 +145,7 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 
 	public function testMiddlewareRefreshesValidElevation(): void
 	{
-		$recentTime = time() - (5 * 60); // 5 minutes ago (still valid)
+		$recentTime = time() - (6 * 60); // 6 minutes ago (past halfway point, should refresh)
 
 		// Set up valid elevated user
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)

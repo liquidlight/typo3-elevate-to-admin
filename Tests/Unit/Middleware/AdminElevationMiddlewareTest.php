@@ -11,6 +11,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -34,12 +35,15 @@ class AdminElevationMiddlewareTest extends TestCase
 
 	private $connectionPoolMock;
 
+	private $loggerMock;
+
 	protected function setUp(): void
 	{
 		parent::setUp();
 
 		$this->eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
-		$this->subject = new AdminElevationMiddleware($this->eventDispatcherMock);
+		$this->loggerMock = $this->createMock(LoggerInterface::class);
+		$this->subject = new AdminElevationMiddleware($this->eventDispatcherMock, $this->loggerMock);
 		$this->backendUserMock = $this->createMock(BackendUserAuthentication::class);
 		$this->requestMock = $this->createMock(ServerRequestInterface::class);
 		$this->handlerMock = $this->createMock(RequestHandlerInterface::class);
@@ -192,7 +196,7 @@ class AdminElevationMiddlewareTest extends TestCase
 
 	public function testProcessRefreshesTimestampWhenNotExpired(): void
 	{
-		$recentTime = time() - (5 * 60); // 5 minutes ago
+		$recentTime = time() - (6 * 60); // 6 minutes ago (past halfway point, should refresh)
 
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
 		$this->backendUserMock->user = [

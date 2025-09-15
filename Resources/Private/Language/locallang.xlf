@@ -7,6 +7,15 @@
 			<trans-unit id="error.no_backend_user">
 				<source>No backend user found</source>
 			</trans-unit>
+			<trans-unit id="error.authentication_required">
+				<source>Authentication required</source>
+			</trans-unit>
+			<trans-unit id="error.invalid_request">
+				<source>Invalid request</source>
+			</trans-unit>
+			<trans-unit id="error.access_denied">
+				<source>Access denied</source>
+			</trans-unit>
 			<trans-unit id="error.user_not_allowed">
 				<source>User not allowed to elevate</source>
 			</trans-unit>
