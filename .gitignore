@@ -2,8 +2,10 @@
 .DS_Store
 .vscode
 .cache
+.claude
 
 vendor/
+var/
 .Build
 
 
