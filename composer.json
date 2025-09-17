@@ -76,6 +76,12 @@
         "parallel-lint": "parallel-lint ./ --exclude ./.Build",
         "php-cs-fixer:dry-run": "@php-cs-fixer:fix --dry-run",
         "php-cs-fixer:fix": "php-cs-fixer fix --config .Build/vendor/lintkit/php-coding-standards-config/.php-cs-fixer.php -v --diff",
+        "prepare-release": [
+            "rm -rf .github",
+            "rm .gitignore",
+            "rm .editorconfig",
+            "rm phpunit.xml"
+        ],
         "test": [
             "@test-unit",
             "@test-functional"
