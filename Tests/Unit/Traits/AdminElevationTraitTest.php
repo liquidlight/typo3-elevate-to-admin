@@ -155,6 +155,7 @@ class AdminElevationTraitTest extends TestCase
 		$userId = 123;
 		$expectedFields = [
 			'admin' => 0,
+			'options' => 3,
 			'tx_elevate_to_admin_admin_since' => 0,
 		];
 
@@ -180,6 +181,7 @@ class AdminElevationTraitTest extends TestCase
 		$timestamp = 1234567890;
 		$expectedFields = [
 			'admin' => 1,
+			'options' => 0,
 			'tx_elevate_to_admin_admin_since' => $timestamp,
 			'tx_elevate_to_admin_is_possible_admin' => 1,
 		];
@@ -214,6 +216,7 @@ class AdminElevationTraitTest extends TestCase
 				'be_users',
 				$this->callback(function ($fields) {
 					return $fields['admin'] === 1
+						&& $fields['options'] === 0
 						&& $fields['tx_elevate_to_admin_is_possible_admin'] === 1
 						&& is_int($fields['tx_elevate_to_admin_admin_since'])
 						&& $fields['tx_elevate_to_admin_admin_since'] > 0;

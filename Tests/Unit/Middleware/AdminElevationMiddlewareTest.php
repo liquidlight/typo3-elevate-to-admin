@@ -183,6 +183,7 @@ class AdminElevationMiddlewareTest extends TestCase
 				'be_users',
 				[
 					'admin' => 0,
+					'options' => 3,
 					'tx_elevate_to_admin_admin_since' => 0,
 				],
 				['uid' => 123]
