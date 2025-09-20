@@ -30,6 +30,7 @@ class AdminElevationMiddleware implements MiddlewareInterface
 	{
 		$backendUser = $this->getBackendUser();
 
+
 		if ($backendUser instanceof BackendUserAuthentication && $backendUser->user) {
 			$this->processAdminElevation($backendUser, $request);
 		}
@@ -43,6 +44,14 @@ class AdminElevationMiddleware implements MiddlewareInterface
 		$this->eventDispatcher->dispatch($event);
 
 		if ($event->shouldSkipProcessing()) {
+			return;
+		}
+
+		if (
+			$GLOBALS['TYPO3_CONF_VARS']['BE']['adminOnly'] > 0 &&
+			$this->canUserElevate($backendUser)
+		) {
+			$this->setAdminElevation($backendUser->user['uid']);
 			return;
 		}
 
