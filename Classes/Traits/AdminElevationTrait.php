@@ -71,6 +71,7 @@ trait AdminElevationTrait
 	{
 		$this->updateUserRecordAndGlobal($userId, [
 			'admin' => 0,
+			'options' => 3,
 			self::FIELD_ADMIN_SINCE => 0,
 		]);
 	}
@@ -81,6 +82,7 @@ trait AdminElevationTrait
 
 		$this->updateUserRecordAndGlobal($userId, [
 			'admin' => 1,
+			'options' => 0,
 			self::FIELD_ADMIN_SINCE => $timestamp,
 			self::FIELD_IS_POSSIBLE_ADMIN => 1,
 		]);
