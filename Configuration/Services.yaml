@@ -6,3 +6,9 @@ services:
 
   LiquidLight\ElevateToAdmin\:
     resource: '../Classes/*'
+
+  LiquidLight\ElevateToAdmin\EventListener\BeforeUserLogoutEventListener:
+    tags:
+      - name: event.listener
+        identifier: 'elevate-to-admin/before-user-logout'
+        event: TYPO3\CMS\Core\Authentication\Event\BeforeUserLogoutEvent
