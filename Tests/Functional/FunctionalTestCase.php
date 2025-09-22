@@ -162,6 +162,7 @@ abstract class FunctionalTestCase extends TestCase
 				username VARCHAR(255) NOT NULL DEFAULT '',
 				password VARCHAR(255) NOT NULL DEFAULT '',
 				admin TINYINT(1) NOT NULL DEFAULT 0,
+				options TINYINT(4) NOT NULL DEFAULT 0,
 				" . 'tx_elevate_to_admin_is_possible_admin' . " TINYINT(1) NOT NULL DEFAULT 0,
 				" . 'tx_elevate_to_admin_admin_since' . " INTEGER NOT NULL DEFAULT 0,
 				tstamp INTEGER NOT NULL DEFAULT 0,

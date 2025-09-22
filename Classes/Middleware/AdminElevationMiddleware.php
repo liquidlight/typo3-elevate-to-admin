@@ -48,7 +48,7 @@ class AdminElevationMiddleware implements MiddlewareInterface
 		}
 
 		if (
-			$GLOBALS['TYPO3_CONF_VARS']['BE']['adminOnly'] > 0 &&
+			($GLOBALS['TYPO3_CONF_VARS']['BE']['adminOnly'] ?? 0) > 0 &&
 			$this->canUserElevate($backendUser)
 		) {
 			$this->setAdminElevation($backendUser->user['uid']);
