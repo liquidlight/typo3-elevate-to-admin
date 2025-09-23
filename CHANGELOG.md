@@ -1,3 +1,16 @@
+# 2.1.0
+
+**23rd September 2025**
+
+#### Features
+
+- Allow potential admins to login when backend is locked for editors (#1)
+- Update `options` field when elevating to avoid duplicate page tree (#7)
+
+#### Fix
+
+- Admin status cleared when logging out (#5)
+
 # 2.0.0
 
 **17th September 2025**

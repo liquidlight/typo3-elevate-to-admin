@@ -3,7 +3,7 @@
     "description": "Allow users to elevate themselves to admin if they have permission to do so",
     "license": "GPL-2.0+",
     "type": "typo3-cms-extension",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "readme": "./README.md",
     "authors": [
         {
