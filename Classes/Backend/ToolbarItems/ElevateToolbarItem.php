@@ -89,7 +89,7 @@ class ElevateToolbarItem implements ToolbarItemInterface, RequestAwareToolbarIte
 
 	private function translate(string $key): string
 	{
-		return $this->getLanguageService()->sL('LLL:EXT:elevate_to_admin/Resources/Private/Language/locallang.xlf:' . $key);
+		return $this->getLanguageService()->sL('LLL:EXT:ll_elevate_to_admin/Resources/Private/Language/locallang.xlf:' . $key);
 	}
 
 	private function addJavaScriptLanguageLabels(): void
@@ -116,7 +116,7 @@ class ElevateToolbarItem implements ToolbarItemInterface, RequestAwareToolbarIte
 		$languageLabels = [];
 		foreach ($labels as $key) {
 			$translatedValue = $this->translate($key);
-			$languageLabels['elevate_to_admin.' . $key] = htmlspecialchars($translatedValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+			$languageLabels['ll_elevate_to_admin.' . $key] = htmlspecialchars($translatedValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 		}
 
 		$this->pageRenderer->addInlineLanguageLabelArray($languageLabels);

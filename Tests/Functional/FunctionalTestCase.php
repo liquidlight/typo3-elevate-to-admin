@@ -163,8 +163,8 @@ abstract class FunctionalTestCase extends TestCase
 				password VARCHAR(255) NOT NULL DEFAULT '',
 				admin TINYINT(1) NOT NULL DEFAULT 0,
 				options TINYINT(4) NOT NULL DEFAULT 0,
-				" . 'tx_elevate_to_admin_is_possible_admin' . " TINYINT(1) NOT NULL DEFAULT 0,
-				" . 'tx_elevate_to_admin_admin_since' . " INTEGER NOT NULL DEFAULT 0,
+				" . 'tx_elevatetoadmin_is_possible_admin' . " TINYINT(1) NOT NULL DEFAULT 0,
+				" . 'tx_elevatetoadmin_admin_since' . " INTEGER NOT NULL DEFAULT 0,
 				tstamp INTEGER NOT NULL DEFAULT 0,
 				crdate INTEGER NOT NULL DEFAULT 0,
 				deleted TINYINT(1) NOT NULL DEFAULT 0
@@ -188,8 +188,8 @@ abstract class FunctionalTestCase extends TestCase
 			'TSconfig' => '',
 			'workspace_id' => 0,
 			'workspace_perms' => 1,
-			'tx_elevate_to_admin_is_possible_admin' => 1,
-			'tx_elevate_to_admin_admin_since' => 0,
+			'tx_elevatetoadmin_is_possible_admin' => 1,
+			'tx_elevatetoadmin_admin_since' => 0,
 			'tstamp' => time(),
 			'crdate' => time(),
 		];

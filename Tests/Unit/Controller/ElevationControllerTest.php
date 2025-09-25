@@ -125,7 +125,7 @@ class ElevationControllerTest extends TestCase
 	public function testElevateActionReturnsErrorWhenUserCannotElevate(): void
 	{
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
-		$this->backendUserMock->user = ['tx_elevate_to_admin_is_possible_admin' => 0];
+		$this->backendUserMock->user = ['tx_elevatetoadmin_is_possible_admin' => 0];
 
 		$this->requestMock
 			->method('getParsedBody')
@@ -143,7 +143,7 @@ class ElevationControllerTest extends TestCase
 	public function testElevateActionReturnsErrorWhenUserAlreadyAdmin(): void
 	{
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
-		$this->backendUserMock->user = ['tx_elevate_to_admin_is_possible_admin' => 1];
+		$this->backendUserMock->user = ['tx_elevatetoadmin_is_possible_admin' => 1];
 
 		$this->backendUserMock
 			->method('isAdmin')
@@ -166,7 +166,7 @@ class ElevationControllerTest extends TestCase
 	public function testElevateActionReturnsErrorWhenPasswordEmpty(): void
 	{
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
-		$this->backendUserMock->user = ['tx_elevate_to_admin_is_possible_admin' => 1];
+		$this->backendUserMock->user = ['tx_elevatetoadmin_is_possible_admin' => 1];
 
 		$this->backendUserMock
 			->method('isAdmin')
@@ -196,7 +196,7 @@ class ElevationControllerTest extends TestCase
 		$hashedPassword = $hasher->getHashedPassword('correct_password');
 
 		$this->backendUserMock->user = [
-			'tx_elevate_to_admin_is_possible_admin' => 1,
+			'tx_elevatetoadmin_is_possible_admin' => 1,
 			'password' => $hashedPassword,
 		];
 
@@ -229,7 +229,7 @@ class ElevationControllerTest extends TestCase
 
 		$this->backendUserMock->user = [
 			'uid' => 123,
-			'tx_elevate_to_admin_is_possible_admin' => 1,
+			'tx_elevatetoadmin_is_possible_admin' => 1,
 			'password' => $hashedPassword,
 		];
 
@@ -284,7 +284,7 @@ class ElevationControllerTest extends TestCase
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
 		$this->backendUserMock->user = [
 			'uid' => 123,
-			'tx_elevate_to_admin_admin_since' => 0,
+			'tx_elevatetoadmin_admin_since' => 0,
 		];
 
 		$this->backendUserMock
@@ -310,7 +310,7 @@ class ElevationControllerTest extends TestCase
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
 		$this->backendUserMock->user = [
 			'uid' => 123,
-			'tx_elevate_to_admin_admin_since' => 1234567890,
+			'tx_elevatetoadmin_admin_since' => 1234567890,
 		];
 
 		$this->backendUserMock

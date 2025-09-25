@@ -59,7 +59,7 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 			'be_users',
 			[
 				'admin' => 1,
-				'tx_elevate_to_admin_admin_since' => 0,
+				'tx_elevatetoadmin_admin_since' => 0,
 			],
 			['uid' => $this->testUserId]
 		);
@@ -91,8 +91,8 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 		]);
 
 		$this->assertEquals(0, $updatedRecord['admin']);
-		$this->assertEquals(0, $updatedRecord['tx_elevate_to_admin_admin_since']);
-		$this->assertEquals(1, $updatedRecord['tx_elevate_to_admin_is_possible_admin']);
+		$this->assertEquals(0, $updatedRecord['tx_elevatetoadmin_admin_since']);
+		$this->assertEquals(1, $updatedRecord['tx_elevatetoadmin_is_possible_admin']);
 	}
 
 	public function testMiddlewareClearsExpiredElevation(): void
@@ -108,7 +108,7 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 			'be_users',
 			[
 				'admin' => 1,
-				'tx_elevate_to_admin_admin_since' => $expiredTime,
+				'tx_elevatetoadmin_admin_since' => $expiredTime,
 			],
 			['uid' => $this->testUserId]
 		);
@@ -140,7 +140,7 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 		]);
 
 		$this->assertEquals(0, $updatedRecord['admin']);
-		$this->assertEquals(0, $updatedRecord['tx_elevate_to_admin_admin_since']);
+		$this->assertEquals(0, $updatedRecord['tx_elevatetoadmin_admin_since']);
 	}
 
 	public function testMiddlewareRefreshesValidElevation(): void
@@ -156,7 +156,7 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 			'be_users',
 			[
 				'admin' => 1,
-				'tx_elevate_to_admin_admin_since' => $recentTime,
+				'tx_elevatetoadmin_admin_since' => $recentTime,
 			],
 			['uid' => $this->testUserId]
 		);
@@ -192,10 +192,10 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 		]);
 
 		$this->assertEquals(1, $updatedRecord['admin']); // Still admin
-		$this->assertGreaterThan($recentTime, $updatedRecord['tx_elevate_to_admin_admin_since']); // Timestamp updated
-		$this->assertGreaterThanOrEqual($beforeProcessTime, $updatedRecord['tx_elevate_to_admin_admin_since']);
-		$this->assertLessThanOrEqual($afterProcessTime, $updatedRecord['tx_elevate_to_admin_admin_since']);
-		$this->assertEquals(1, $updatedRecord['tx_elevate_to_admin_is_possible_admin']);
+		$this->assertGreaterThan($recentTime, $updatedRecord['tx_elevatetoadmin_admin_since']); // Timestamp updated
+		$this->assertGreaterThanOrEqual($beforeProcessTime, $updatedRecord['tx_elevatetoadmin_admin_since']);
+		$this->assertLessThanOrEqual($afterProcessTime, $updatedRecord['tx_elevatetoadmin_admin_since']);
+		$this->assertEquals(1, $updatedRecord['tx_elevatetoadmin_is_possible_admin']);
 	}
 
 	public function testMiddlewareIgnoresNonAdminUsers(): void
@@ -231,8 +231,8 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 		]);
 
 		$this->assertEquals($originalRecord['admin'], $updatedRecord['admin']);
-		$this->assertEquals($originalRecord['tx_elevate_to_admin_admin_since'], $updatedRecord['tx_elevate_to_admin_admin_since']);
-		$this->assertEquals($originalRecord['tx_elevate_to_admin_is_possible_admin'], $updatedRecord['tx_elevate_to_admin_is_possible_admin']);
+		$this->assertEquals($originalRecord['tx_elevatetoadmin_admin_since'], $updatedRecord['tx_elevatetoadmin_admin_since']);
+		$this->assertEquals($originalRecord['tx_elevatetoadmin_is_possible_admin'], $updatedRecord['tx_elevatetoadmin_is_possible_admin']);
 	}
 
 	public function testMiddlewareHandlesNoBackendUser(): void
@@ -270,7 +270,7 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 			'be_users',
 			[
 				'admin' => 1,
-				'tx_elevate_to_admin_admin_since' => $exactTimeoutTime,
+				'tx_elevatetoadmin_admin_since' => $exactTimeoutTime,
 			],
 			['uid' => $this->testUserId]
 		);
@@ -303,8 +303,8 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 
 		// Either refreshed (still valid) or cleared (expired) - both are correct behavior
 		$this->assertTrue(
-			($updatedRecord['admin'] == 1 && $updatedRecord['tx_elevate_to_admin_admin_since'] > $exactTimeoutTime) ||
-			($updatedRecord['admin'] == 0 && $updatedRecord['tx_elevate_to_admin_admin_since'] == 0)
+			($updatedRecord['admin'] == 1 && $updatedRecord['tx_elevatetoadmin_admin_since'] > $exactTimeoutTime) ||
+			($updatedRecord['admin'] == 0 && $updatedRecord['tx_elevatetoadmin_admin_since'] == 0)
 		);
 	}
 
@@ -319,8 +319,8 @@ class AdminElevationMiddlewareFunctionalTest extends FunctionalTestCase
 			'username' => 'middleware_test_user',
 			'password' => '$argon2i$v=19$m=65536,t=16,p=1$test',
 			'admin' => 0,
-			'tx_elevate_to_admin_is_possible_admin' => 1,
-			'tx_elevate_to_admin_admin_since' => 0,
+			'tx_elevatetoadmin_is_possible_admin' => 1,
+			'tx_elevatetoadmin_admin_since' => 0,
 			'tstamp' => time(),
 			'crdate' => time(),
 		]);
