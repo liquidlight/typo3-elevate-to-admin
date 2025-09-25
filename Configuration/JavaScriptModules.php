@@ -20,6 +20,6 @@ return [
 				'EXT:backend/Resources/Public/JavaScript/Contrib/',
 			],
 		],
-		'@liquidlight/elevate-to-admin/' => 'EXT:elevate_to_admin/Resources/Public/JavaScript/',
+		'@liquidlight/elevate-to-admin/' => 'EXT:ll_elevate_to_admin/Resources/Public/JavaScript/',
 	],
 ];

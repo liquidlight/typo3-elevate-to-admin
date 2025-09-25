@@ -31,7 +31,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 	{
 		$fields = [
 			'admin' => 1,
-			'tx_elevate_to_admin_admin_since' => time(),
+			'tx_elevatetoadmin_admin_since' => time(),
 		];
 
 		$this->updateUserRecord($this->testUserId, $fields);
@@ -42,7 +42,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 
 		$this->assertNotNull($record);
 		$this->assertEquals(1, $record['admin']);
-		$this->assertGreaterThan(0, $record['tx_elevate_to_admin_admin_since']);
+		$this->assertGreaterThan(0, $record['tx_elevatetoadmin_admin_since']);
 	}
 
 	public function testClearAdminElevationUpdatesDatabase(): void
@@ -56,7 +56,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 			'be_users',
 			[
 				'admin' => 1,
-				'tx_elevate_to_admin_admin_since' => time(),
+				'tx_elevatetoadmin_admin_since' => time(),
 			],
 			['uid' => $this->testUserId]
 		);
@@ -65,7 +65,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 		$backendUser = $this->createBackendUser([
 			'uid' => $this->testUserId,
 			'admin' => 1,
-			'tx_elevate_to_admin_admin_since' => time(),
+			'tx_elevatetoadmin_admin_since' => time(),
 		]);
 		$this->setGlobalBackendUser($backendUser);
 
@@ -79,7 +79,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 
 		$this->assertNotNull($record);
 		$this->assertEquals(0, $record['admin']);
-		$this->assertEquals(0, $record['tx_elevate_to_admin_admin_since']);
+		$this->assertEquals(0, $record['tx_elevatetoadmin_admin_since']);
 	}
 
 	public function testSetAdminElevationUpdatesDatabase(): void
@@ -100,8 +100,8 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 
 		$this->assertNotNull($record);
 		$this->assertEquals(1, $record['admin']);
-		$this->assertEquals($timestamp, $record['tx_elevate_to_admin_admin_since']);
-		$this->assertEquals(1, $record['tx_elevate_to_admin_is_possible_admin']);
+		$this->assertEquals($timestamp, $record['tx_elevatetoadmin_admin_since']);
+		$this->assertEquals(1, $record['tx_elevatetoadmin_is_possible_admin']);
 	}
 
 	public function testSetAdminElevationWithCurrentTimestamp(): void
@@ -123,9 +123,9 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 
 		$this->assertNotNull($record);
 		$this->assertEquals(1, $record['admin']);
-		$this->assertGreaterThanOrEqual($beforeTime, $record['tx_elevate_to_admin_admin_since']);
-		$this->assertLessThanOrEqual($afterTime, $record['tx_elevate_to_admin_admin_since']);
-		$this->assertEquals(1, $record['tx_elevate_to_admin_is_possible_admin']);
+		$this->assertGreaterThanOrEqual($beforeTime, $record['tx_elevatetoadmin_admin_since']);
+		$this->assertLessThanOrEqual($afterTime, $record['tx_elevatetoadmin_admin_since']);
+		$this->assertEquals(1, $record['tx_elevatetoadmin_is_possible_admin']);
 	}
 
 	public function testCanUserElevateWithDatabaseData(): void
@@ -133,7 +133,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 		// Test user with elevation permission
 		$backendUser = $this->createBackendUser([
 			'uid' => $this->testUserId,
-			'tx_elevate_to_admin_is_possible_admin' => 1,
+			'tx_elevatetoadmin_is_possible_admin' => 1,
 		]);
 
 		$result = $this->canUserElevate($backendUser);
@@ -142,7 +142,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 		// Test user without elevation permission
 		$backendUserNoPermission = $this->createBackendUser([
 			'uid' => $this->testUserId + 1,
-			'tx_elevate_to_admin_is_possible_admin' => 0,
+			'tx_elevatetoadmin_is_possible_admin' => 0,
 		]);
 
 		$result = $this->canUserElevate($backendUserNoPermission);
@@ -159,7 +159,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 
 		$fields = [
 			'admin' => 1,
-			'tx_elevate_to_admin_admin_since' => time(),
+			'tx_elevatetoadmin_admin_since' => time(),
 		];
 
 		$this->updateUserRecordAndGlobal($this->testUserId, $fields);
@@ -172,7 +172,7 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 
 		// Check global user data was updated
 		$this->assertEquals(1, $GLOBALS['BE_USER']->user['admin']);
-		$this->assertEquals($fields['tx_elevate_to_admin_admin_since'], $GLOBALS['BE_USER']->user['tx_elevate_to_admin_admin_since']);
+		$this->assertEquals($fields['tx_elevatetoadmin_admin_since'], $GLOBALS['BE_USER']->user['tx_elevatetoadmin_admin_since']);
 	}
 
 	private function createTestUser(): void
@@ -186,8 +186,8 @@ class AdminElevationTraitFunctionalTest extends FunctionalTestCase
 			'username' => 'functional_test_user',
 			'password' => '$argon2i$v=19$m=65536,t=16,p=1$test',
 			'admin' => 0,
-			'tx_elevate_to_admin_is_possible_admin' => 1,
-			'tx_elevate_to_admin_admin_since' => 0,
+			'tx_elevatetoadmin_is_possible_admin' => 1,
+			'tx_elevatetoadmin_admin_since' => 0,
 			'tstamp' => time(),
 			'crdate' => time(),
 		]);

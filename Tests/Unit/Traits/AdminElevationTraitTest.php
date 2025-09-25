@@ -112,7 +112,7 @@ class AdminElevationTraitTest extends TestCase
 	public function testCanUserElevateReturnsTrueWhenUserHasPermission(): void
 	{
 		$this->backendUserMock->user = [
-			'tx_elevate_to_admin_is_possible_admin' => 1,
+			'tx_elevatetoadmin_is_possible_admin' => 1,
 		];
 
 		$result = $this->canUserElevate($this->backendUserMock);
@@ -123,7 +123,7 @@ class AdminElevationTraitTest extends TestCase
 	public function testCanUserElevateReturnsFalseWhenUserHasNoPermission(): void
 	{
 		$this->backendUserMock->user = [
-			'tx_elevate_to_admin_is_possible_admin' => 0,
+			'tx_elevatetoadmin_is_possible_admin' => 0,
 		];
 
 		$result = $this->canUserElevate($this->backendUserMock);
@@ -141,7 +141,7 @@ class AdminElevationTraitTest extends TestCase
 	public function testCanUserElevateUsesGlobalUserWhenNotProvided(): void
 	{
 		$this->backendUserMock->user = [
-			'tx_elevate_to_admin_is_possible_admin' => 1,
+			'tx_elevatetoadmin_is_possible_admin' => 1,
 		];
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
 
@@ -156,7 +156,7 @@ class AdminElevationTraitTest extends TestCase
 		$expectedFields = [
 			'admin' => 0,
 			'options' => 3,
-			'tx_elevate_to_admin_admin_since' => 0,
+			'tx_elevatetoadmin_admin_since' => 0,
 		];
 
 		$this->backendUserMock->user = ['uid' => $userId];
@@ -182,8 +182,8 @@ class AdminElevationTraitTest extends TestCase
 		$expectedFields = [
 			'admin' => 1,
 			'options' => 0,
-			'tx_elevate_to_admin_admin_since' => $timestamp,
-			'tx_elevate_to_admin_is_possible_admin' => 1,
+			'tx_elevatetoadmin_admin_since' => $timestamp,
+			'tx_elevatetoadmin_is_possible_admin' => 1,
 		];
 
 		$this->backendUserMock->user = ['uid' => $userId];
@@ -217,9 +217,9 @@ class AdminElevationTraitTest extends TestCase
 				$this->callback(function ($fields) {
 					return $fields['admin'] === 1
 						&& $fields['options'] === 0
-						&& $fields['tx_elevate_to_admin_is_possible_admin'] === 1
-						&& is_int($fields['tx_elevate_to_admin_admin_since'])
-						&& $fields['tx_elevate_to_admin_admin_since'] > 0;
+						&& $fields['tx_elevatetoadmin_is_possible_admin'] === 1
+						&& is_int($fields['tx_elevatetoadmin_admin_since'])
+						&& $fields['tx_elevatetoadmin_admin_since'] > 0;
 				}),
 				['uid' => $userId]
 			)
@@ -232,7 +232,7 @@ class AdminElevationTraitTest extends TestCase
 	{
 		$timestamp = 1234567890;
 		$this->backendUserMock->user = [
-			'tx_elevate_to_admin_admin_since' => $timestamp,
+			'tx_elevatetoadmin_admin_since' => $timestamp,
 		];
 
 		$result = $this->getAdminSince($this->backendUserMock);
@@ -259,7 +259,7 @@ class AdminElevationTraitTest extends TestCase
 	public function testIsCurrentlyElevatedReturnsTrueWhenElevated(): void
 	{
 		$this->backendUserMock->user = [
-			'tx_elevate_to_admin_admin_since' => 1234567890,
+			'tx_elevatetoadmin_admin_since' => 1234567890,
 		];
 		$this->backendUserMock->method('isAdmin')->willReturn(true);
 
@@ -271,7 +271,7 @@ class AdminElevationTraitTest extends TestCase
 	public function testIsCurrentlyElevatedReturnsFalseWhenNotAdmin(): void
 	{
 		$this->backendUserMock->user = [
-			'tx_elevate_to_admin_admin_since' => 1234567890,
+			'tx_elevatetoadmin_admin_since' => 1234567890,
 		];
 		$this->backendUserMock->method('isAdmin')->willReturn(false);
 
@@ -283,7 +283,7 @@ class AdminElevationTraitTest extends TestCase
 	public function testIsCurrentlyElevatedReturnsFalseWhenAdminSinceIsZero(): void
 	{
 		$this->backendUserMock->user = [
-			'tx_elevate_to_admin_admin_since' => 0,
+			'tx_elevatetoadmin_admin_since' => 0,
 		];
 		$this->backendUserMock->method('isAdmin')->willReturn(true);
 

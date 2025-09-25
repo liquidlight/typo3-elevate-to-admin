@@ -12,9 +12,9 @@ trait AdminElevationTrait
 {
 	public const TABLE_BE_USERS = 'be_users';
 
-	public const FIELD_IS_POSSIBLE_ADMIN = 'tx_elevate_to_admin_is_possible_admin';
+	public const FIELD_IS_POSSIBLE_ADMIN = 'tx_elevatetoadmin_is_possible_admin';
 
-	public const FIELD_ADMIN_SINCE = 'tx_elevate_to_admin_admin_since';
+	public const FIELD_ADMIN_SINCE = 'tx_elevatetoadmin_admin_since';
 
 	protected function getBackendUser(): ?BackendUserAuthentication
 	{
@@ -112,7 +112,7 @@ trait AdminElevationTrait
 
 	protected function createLogContext(array $context = []): array
 	{
-		$context['component'] = 'elevate_to_admin';
+		$context['component'] = 'll_elevate_to_admin';
 		$context['remote_ip'] = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 		return $context;
 	}
