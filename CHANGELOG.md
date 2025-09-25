@@ -1,3 +1,11 @@
+# 2.2.0
+
+**25th September 2025**
+
+#### Refactor
+
+- Rename extension to `ll_elevate_to_admin` to fit with Liquid Light conventions
+
 # 2.1.0
 
 **23rd September 2025**
