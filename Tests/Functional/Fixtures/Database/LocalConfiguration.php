@@ -30,7 +30,7 @@ return [
 		],
 	],
 	'EXTENSIONS' => [
-		'elevate_to_admin' => [
+		'll_elevate_to_admin' => [
 			// Extension configuration
 		],
 	],

@@ -9,7 +9,7 @@ define([
 	 * Get localized string
 	 */
 	function getLabel(key) {
-		return TYPO3.lang['elevate_to_admin.' + key] || key;
+		return TYPO3.lang['ll_elevate_to_admin.' + key] || key;
 	}
 
 	var ElevateAdmin = {

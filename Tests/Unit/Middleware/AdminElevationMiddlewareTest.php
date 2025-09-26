@@ -116,7 +116,7 @@ class AdminElevationMiddlewareTest extends TestCase
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
 		$this->backendUserMock->user = [
 			'uid' => 123,
-			'tx_elevate_to_admin_admin_since' => 0,
+			'tx_elevatetoadmin_admin_since' => 0,
 		];
 
 		$this->eventDispatcherMock
@@ -138,8 +138,8 @@ class AdminElevationMiddlewareTest extends TestCase
 				'be_users',
 				[
 					'admin' => 0,
-					'tx_elevate_to_admin_admin_since' => 0,
-					'tx_elevate_to_admin_is_possible_admin' => 1,
+					'tx_elevatetoadmin_admin_since' => 0,
+					'tx_elevatetoadmin_is_possible_admin' => 1,
 				],
 				['uid' => 123]
 			)
@@ -157,7 +157,7 @@ class AdminElevationMiddlewareTest extends TestCase
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
 		$this->backendUserMock->user = [
 			'uid' => 123,
-			'tx_elevate_to_admin_admin_since' => $expiredTime,
+			'tx_elevatetoadmin_admin_since' => $expiredTime,
 		];
 
 		$this->eventDispatcherMock
@@ -179,7 +179,7 @@ class AdminElevationMiddlewareTest extends TestCase
 				'be_users',
 				[
 					'admin' => 0,
-					'tx_elevate_to_admin_admin_since' => 0,
+					'tx_elevatetoadmin_admin_since' => 0,
 				],
 				['uid' => 123]
 			)
@@ -197,7 +197,7 @@ class AdminElevationMiddlewareTest extends TestCase
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
 		$this->backendUserMock->user = [
 			'uid' => 123,
-			'tx_elevate_to_admin_admin_since' => $recentTime,
+			'tx_elevatetoadmin_admin_since' => $recentTime,
 		];
 
 		$this->eventDispatcherMock
@@ -218,9 +218,9 @@ class AdminElevationMiddlewareTest extends TestCase
 			->with(
 				'be_users',
 				$this->callback(function ($fields) {
-					return $fields['tx_elevate_to_admin_is_possible_admin'] === 1
-						&& is_int($fields['tx_elevate_to_admin_admin_since'])
-						&& $fields['tx_elevate_to_admin_admin_since'] > 0;
+					return $fields['tx_elevatetoadmin_is_possible_admin'] === 1
+						&& is_int($fields['tx_elevatetoadmin_admin_since'])
+						&& $fields['tx_elevatetoadmin_admin_since'] > 0;
 				}),
 				['uid' => 123]
 			)

@@ -17,7 +17,7 @@ class ElevateToolbarItem implements ToolbarItemInterface
 
 	public function __construct(
 	) {
-		$this->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/ElevateToAdmin/ElevateAdmin');
+		$this->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/LlElevateToAdmin/ElevateAdmin');
 		$this->addJavaScriptLanguageLabels();
 	}
 
@@ -85,14 +85,14 @@ class ElevateToolbarItem implements ToolbarItemInterface
 		$view = GeneralUtility::makeInstance(StandaloneView::class);
 		$view->setLayoutRootPaths([
 			'EXT:backend/Resources/Private/Layouts',
-			'EXT:elevate_to_admin/Resources/Private/Layouts',
+			'EXT:ll_elevate_to_admin/Resources/Private/Layouts',
 		]);
 		$view->setPartialRootPaths([
 			'EXT:backend/Resources/Private/Partials/ToolbarItems',
-			'EXT:elevate_to_admin/Resources/Private/Partials/ToolbarItems',
+			'EXT:ll_elevate_to_admin/Resources/Private/Partials/ToolbarItems',
 		]);
 		$view->setTemplateRootPaths([
-			'EXT:elevate_to_admin/Resources/Private/Templates/ToolbarItems',
+			'EXT:ll_elevate_to_admin/Resources/Private/Templates/ToolbarItems',
 		]);
 
 		$view->setTemplate($filename);
@@ -109,7 +109,7 @@ class ElevateToolbarItem implements ToolbarItemInterface
 
 	private function translate(string $key): string
 	{
-		return $this->getLanguageService()->sL('LLL:EXT:elevate_to_admin/Resources/Private/Language/locallang.xlf:' . $key);
+		return $this->getLanguageService()->sL('LLL:EXT:ll_elevate_to_admin/Resources/Private/Language/locallang.xlf:' . $key);
 	}
 
 	private function addJavaScriptLanguageLabels(): void
@@ -135,7 +135,7 @@ class ElevateToolbarItem implements ToolbarItemInterface
 
 		$languageLabels = [];
 		foreach ($labels as $key) {
-			$languageLabels['elevate_to_admin.' . $key] = $this->translate($key);
+			$languageLabels['ll_elevate_to_admin.' . $key] = $this->translate($key);
 		}
 
 		$this->getPageRenderer()->addInlineLanguageLabelArray($languageLabels);

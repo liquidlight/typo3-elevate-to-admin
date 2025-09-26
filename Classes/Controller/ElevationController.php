@@ -42,7 +42,7 @@ class ElevationController
 
 	private function translate(string $key): string
 	{
-		return $this->getLanguageService()->sL('LLL:EXT:elevate_to_admin/Resources/Private/Language/locallang.xlf:' . $key);
+		return $this->getLanguageService()->sL('LLL:EXT:ll_elevate_to_admin/Resources/Private/Language/locallang.xlf:' . $key);
 	}
 
 	private function elevateToAdmin(BackendUserAuthentication $backendUser, array $parsedBody): ResponseInterface

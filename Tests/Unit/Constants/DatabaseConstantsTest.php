@@ -17,7 +17,7 @@ class DatabaseConstantsTest extends TestCase
 	public function testFieldIsPossibleAdminConstant(): void
 	{
 		$this->assertEquals(
-			'tx_elevate_to_admin_is_possible_admin',
+			'tx_elevatetoadmin_is_possible_admin',
 			DatabaseConstants::FIELD_IS_POSSIBLE_ADMIN
 		);
 	}
@@ -25,7 +25,7 @@ class DatabaseConstantsTest extends TestCase
 	public function testFieldAdminSinceConstant(): void
 	{
 		$this->assertEquals(
-			'tx_elevate_to_admin_admin_since',
+			'tx_elevatetoadmin_admin_since',
 			DatabaseConstants::FIELD_ADMIN_SINCE
 		);
 	}

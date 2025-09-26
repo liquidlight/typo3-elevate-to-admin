@@ -52,7 +52,7 @@
     },
     "extra": {
         "typo3/cms": {
-            "extension-key": "elevate_to_admin",
+            "extension-key": "ll_elevate_to_admin",
             "web-dir": ".Build/public"
         }
     },
