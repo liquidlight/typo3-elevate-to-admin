@@ -42,7 +42,7 @@
 				<source>Enter Admin Mode</source>
 			</trans-unit>
 			<trans-unit id="toolbar.title">
-				<source>Admin Elevation</source>
+				<source>Admin Mode</source>
 			</trans-unit>
 
 			<!-- JavaScript modal and form labels -->
