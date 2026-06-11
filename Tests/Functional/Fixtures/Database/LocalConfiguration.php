@@ -68,6 +68,10 @@ return [
 		],
 		'caching' => [
 			'cacheConfigurations' => [
+				'runtime' => [
+					'frontend' => 'TYPO3\\CMS\\Core\\Cache\\Frontend\\VariableFrontend',
+					'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\TransientMemoryBackend',
+				],
 				'hash' => [
 					'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend',
 				],

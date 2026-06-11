@@ -74,6 +74,19 @@ abstract class FunctionalTestCase extends TestCase
 			define('PATH_typo3conf', PATH_site . 'typo3conf/');
 		}
 
+		// Initialize the TYPO3 Environment, required by Connection::getSchemaInformation() in TYPO3 v13
+		\TYPO3\CMS\Core\Core\Environment::initialize(
+			new \TYPO3\CMS\Core\Core\ApplicationContext('Testing'),
+			true,
+			true,
+			$testRoot,
+			$buildPath . '/public',
+			$buildPath . '/var',
+			$buildPath . '/public/typo3conf',
+			$testRoot . '/vendor/bin/phpunit',
+			'UNIX'
+		);
+
 		// Load test configuration
 		$GLOBALS['TYPO3_CONF_VARS'] = require __DIR__ . '/Fixtures/Database/LocalConfiguration.php';
 
@@ -122,6 +135,30 @@ abstract class FunctionalTestCase extends TestCase
 
 		// Initialize minimal backend user for testing
 		$GLOBALS['BE_USER'] = null;
+
+		// Provide a minimal PSR-11 container so GeneralUtility::makeInstance() can resolve
+		// PackageDependentCacheIdentifier, which TYPO3 v13's Connection::getSchemaInformation() requires
+		$packageManagerMock = $this->createMock(\TYPO3\CMS\Core\Package\PackageManager::class);
+		$packageManagerMock->method('getCacheIdentifier')->willReturn('test');
+		$packageDependentCacheIdentifier = new \TYPO3\CMS\Core\Package\Cache\PackageDependentCacheIdentifier($packageManagerMock);
+
+		$container = new class ($packageDependentCacheIdentifier) implements \Psr\Container\ContainerInterface {
+			public function __construct(private readonly \TYPO3\CMS\Core\Package\Cache\PackageDependentCacheIdentifier $packageDependentCacheIdentifier)
+			{
+			}
+
+			public function get(string $id): mixed
+			{
+				return $this->packageDependentCacheIdentifier;
+			}
+
+			public function has(string $id): bool
+			{
+				return $id === \TYPO3\CMS\Core\Package\Cache\PackageDependentCacheIdentifier::class;
+			}
+		};
+
+		\TYPO3\CMS\Core\Utility\GeneralUtility::setContainer($container);
 	}
 
 	/**
