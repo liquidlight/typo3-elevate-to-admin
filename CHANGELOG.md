@@ -1,3 +1,11 @@
+# 2.3.0
+
+**19th August 2026**
+
+#### Feature
+
+- Add support for TYPO3 v14 (#12)
+
 # 2.2.0
 
 **25th September 2025**
