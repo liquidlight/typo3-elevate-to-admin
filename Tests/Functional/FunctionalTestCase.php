@@ -142,19 +142,42 @@ abstract class FunctionalTestCase extends TestCase
 		$packageManagerMock->method('getCacheIdentifier')->willReturn('test');
 		$packageDependentCacheIdentifier = new \TYPO3\CMS\Core\Package\Cache\PackageDependentCacheIdentifier($packageManagerMock);
 
-		$container = new class ($packageDependentCacheIdentifier) implements \Psr\Container\ContainerInterface {
-			public function __construct(private readonly \TYPO3\CMS\Core\Package\Cache\PackageDependentCacheIdentifier $packageDependentCacheIdentifier)
+		// TYPO3 v14's restriction classes (e.g. DeletedRestriction) resolve TcaSchemaFactory via
+		// GeneralUtility::makeInstance(), which needs the container to know how to build it since
+		// there is no real DI container in this hand-rolled bootstrap
+		$flexFormTools = new \TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools(
+			new \TYPO3\CMS\Core\EventDispatcher\NoopEventDispatcher(),
+			new \TYPO3\CMS\Core\Configuration\Tca\TcaMigration(),
+			new \TYPO3\CMS\Core\Configuration\Tca\TcaPreparation(),
+		);
+		$tcaSchemaBuilder = new \TYPO3\CMS\Core\Schema\TcaSchemaBuilder(
+			new \TYPO3\CMS\Core\Schema\RelationMapBuilder($flexFormTools),
+			new \TYPO3\CMS\Core\Schema\FieldTypeFactory(),
+		);
+		$tcaSchemaFactory = new \TYPO3\CMS\Core\Schema\TcaSchemaFactory(
+			$tcaSchemaBuilder,
+			'test',
+			new \TYPO3\CMS\Core\Cache\Frontend\PhpFrontend('core', new \TYPO3\CMS\Core\Cache\Backend\NullBackend()),
+		);
+
+		$containerServices = [
+			\TYPO3\CMS\Core\Package\Cache\PackageDependentCacheIdentifier::class => $packageDependentCacheIdentifier,
+			\TYPO3\CMS\Core\Schema\TcaSchemaFactory::class => $tcaSchemaFactory,
+		];
+
+		$container = new class ($containerServices) implements \Psr\Container\ContainerInterface {
+			public function __construct(private readonly array $services)
 			{
 			}
 
 			public function get(string $id): mixed
 			{
-				return $this->packageDependentCacheIdentifier;
+				return $this->services[$id];
 			}
 
 			public function has(string $id): bool
 			{
-				return $id === \TYPO3\CMS\Core\Package\Cache\PackageDependentCacheIdentifier::class;
+				return isset($this->services[$id]);
 			}
 		};
 
