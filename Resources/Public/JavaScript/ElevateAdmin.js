@@ -1,6 +1,7 @@
 import Modal from '@typo3/backend/modal.js';
 import AjaxRequest from '@typo3/core/ajax/ajax-request.js';
 import Notification from '@typo3/backend/notification.js';
+import { sudoModeInterceptor } from '@typo3/backend/security/sudo-mode-interceptor.js';
 
 /**
  * Get localized string
@@ -30,7 +31,7 @@ const ElevateAdmin = {
 			if (enterButton) {
 				enterButton.addEventListener('click', function(e) {
 					e.preventDefault();
-					self.showPasswordModal();
+					self.processElevation();
 				});
 			}
 
@@ -48,63 +49,13 @@ const ElevateAdmin = {
 			}
 		},
 
-		showPasswordModal: function() {
-			const self = this;
-			const htmlString =
-				'<div class="form-group">' +
-					'<label for="admin-password">' + getLabel('modal.password_label') + '</label>' +
-					'<input type="password" class="form-control" id="admin-password" placeholder="' + getLabel('modal.password_placeholder') + '" />' +
-				'</div>';
-			const html = document.createElement('div');
-			html.innerHTML = htmlString;
-
-			const modal = Modal.show(
-				getLabel('modal.enter_admin_title'),
-				html,
-				Modal.sizes.small,
-				[
-					{
-						text: getLabel('modal.cancel'),
-						btnClass: 'btn-default',
-						trigger: function() {
-							Modal.dismiss();
-						}
-					},
-					{
-						text: getLabel('modal.enter'),
-						btnClass: 'btn-danger',
-						trigger: function() {
-							self.processElevation();
-						}
-					}
-				]
-			);
-
-			// Use setTimeout to ensure modal is rendered before focusing
-			setTimeout(function() {
-				const passwordField = document.getElementById('admin-password');
-				if (passwordField) {
-					passwordField.focus();
-					passwordField.addEventListener('keypress', function(e) {
-						if (e.key === 'Enter' || e.keyCode === 13) {
-							self.processElevation();
-						}
-					});
-				}
-			}, 100);
-		},
-
 		processElevation: function() {
-			const field = document.getElementById('admin-password');
-			const password = field ? field.value : '';
-			if (!password) { Notification.error(getLabel('js.error_title'), getLabel('error.password_required')); return; }
-			new AjaxRequest(TYPO3.settings.ajaxUrls.elevate_admin).post({ password: password })
+			// TYPO3 asks for the user's password (sudo mode) before the request is processed
+			new AjaxRequest(TYPO3.settings.ajaxUrls.elevate_admin)
+				.addMiddleware(sudoModeInterceptor)
+				.post({})
 				.then(async response => await response.resolve())
 				.then(function (data) {
-					try {
-						Modal.dismiss();
-					} catch (e) { console.log('Modal hide error:', e); }
-
 					if (data && data.success) {
 						Notification.success(getLabel('js.success_title'), data.message || getLabel('success.elevated_to_admin'));
 						if (data.reload) {
@@ -114,9 +65,10 @@ const ElevateAdmin = {
 						Notification.error(getLabel('js.error_title'), (data && data.message) || getLabel('js.elevation_failed'));
 					}
 				}).catch(function (error) {
-					try {
-						Modal.dismiss();
-					} catch (e) { }
+					// 422 means the password dialog was closed without verifying
+					if (error && error.response && error.response.status === 422) {
+						return;
+					}
 					console.error('Elevation error:', error);
 					Notification.error(getLabel('js.error_title'), getLabel('js.elevation_request_failed'));
 				});
@@ -149,7 +101,7 @@ const ElevateAdmin = {
 		},
 
 		performLeaveAdmin: function() {
-			new AjaxRequest(TYPO3.settings.ajaxUrls.elevate_admin).post({ action: 'leave' })
+			new AjaxRequest(TYPO3.settings.ajaxUrls.elevate_admin_leave).post({})
 				.then(async response => await response.resolve())
 				.then(function (data) {
 					Modal.dismiss();

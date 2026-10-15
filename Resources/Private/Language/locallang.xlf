@@ -22,12 +22,6 @@
 			<trans-unit id="error.already_admin">
 				<source>User is already admin</source>
 			</trans-unit>
-			<trans-unit id="error.password_required">
-				<source>Password is required</source>
-			</trans-unit>
-			<trans-unit id="error.invalid_password">
-				<source>Invalid password</source>
-			</trans-unit>
 			<trans-unit id="error.not_admin">
 				<source>User is not admin</source>
 			</trans-unit>
@@ -55,20 +49,8 @@
 			</trans-unit>
 
 			<!-- JavaScript modal and form labels -->
-			<trans-unit id="modal.enter_admin_title">
-				<source>Enter admin mode</source>
-			</trans-unit>
-			<trans-unit id="modal.password_label">
-				<source>Please enter your password to enter admin mode:</source>
-			</trans-unit>
-			<trans-unit id="modal.password_placeholder">
-				<source>Password</source>
-			</trans-unit>
 			<trans-unit id="modal.cancel">
 				<source>Cancel</source>
-			</trans-unit>
-			<trans-unit id="modal.enter">
-				<source>Enter</source>
 			</trans-unit>
 			<trans-unit id="modal.leave_admin_title">
 				<source>Leave Admin Mode</source>
