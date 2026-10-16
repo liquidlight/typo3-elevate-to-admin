@@ -1,3 +1,11 @@
+# 2.3.1
+
+**16th October 2026**
+
+#### Fix
+
+- Set `backend` as a JavaScript dependency and remove specific backend JS files (#15)
+
 # 2.3.0
 
 **19th August 2026**
