@@ -47,22 +47,22 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 		$backendUser = $this->createBackendUser($userData);
 		$this->setGlobalBackendUser($backendUser);
 
-		// Note: In a real functional test, we'd need proper password hashing setup
-		// For this demo, we'll test the flow up to password verification
-		$request = $this->createRequest([
-			'action' => 'elevate',
-			'password' => 'testpassword',
-		]);
-
-		$response = $this->subject->elevateAction($request);
+		$response = $this->subject->elevateAction($this->createRequest());
 
 		$this->assertInstanceOf(JsonResponse::class, $response);
 		$responseData = json_decode($response->getBody()->getContents(), true);
 
-		// Since password verification will fail without proper setup,
-		// we expect an invalid password error
-		$this->assertFalse($responseData['success']);
+		$this->assertTrue($responseData['success']);
+		$this->assertTrue($responseData['reload']);
 		$this->assertStringStartsWith('translated_', $responseData['message']);
+
+		// Verify database changes
+		$updatedRecord = $this->getDatabaseRecord(self::TABLE_BE_USERS, [
+			'uid' => $this->testUserId,
+		]);
+
+		$this->assertEquals(1, $updatedRecord['admin']);
+		$this->assertGreaterThan(0, $updatedRecord[self::FIELD_ADMIN_SINCE]);
 	}
 
 	public function testElevateActionHandlesUserWithoutPermission(): void
@@ -79,12 +79,7 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 		$backendUser = $this->createBackendUser($userData);
 		$this->setGlobalBackendUser($backendUser);
 
-		$request = $this->createRequest([
-			'action' => 'elevate',
-			'password' => 'testpassword',
-		]);
-
-		$response = $this->subject->elevateAction($request);
+		$response = $this->subject->elevateAction($this->createRequest());
 
 		$this->assertInstanceOf(JsonResponse::class, $response);
 		$responseData = json_decode($response->getBody()->getContents(), true);
@@ -93,7 +88,7 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 		$this->assertStringStartsWith('translated_', $responseData['message']);
 	}
 
-	public function testLeaveAdminModeIntegration(): void
+	public function testLeaveActionIntegration(): void
 	{
 		// Set user as elevated admin in database
 		$timestamp = time();
@@ -116,11 +111,7 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 
 		$this->setGlobalBackendUser($backendUserMock);
 
-		$request = $this->createRequest([
-			'action' => 'leave',
-		]);
-
-		$response = $this->subject->elevateAction($request);
+		$response = $this->subject->leaveAction($this->createRequest());
 
 		$this->assertInstanceOf(JsonResponse::class, $response);
 		$responseData = json_decode($response->getBody()->getContents(), true);
@@ -159,12 +150,7 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 
 		$this->setGlobalBackendUser($backendUserMock);
 
-		$request = $this->createRequest([
-			'action' => 'elevate',
-			'password' => 'testpassword',
-		]);
-
-		$response = $this->subject->elevateAction($request);
+		$response = $this->subject->elevateAction($this->createRequest());
 
 		$this->assertInstanceOf(JsonResponse::class, $response);
 		$responseData = json_decode($response->getBody()->getContents(), true);
@@ -182,13 +168,8 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 		$backendUser = $this->createBackendUser($originalUserData);
 		$this->setGlobalBackendUser($backendUser);
 
-		// Test with empty password (should fail)
-		$request = $this->createRequest([
-			'action' => 'elevate',
-			'password' => '',
-		]);
-
-		$response = $this->subject->elevateAction($request);
+		// Leaving admin mode without being elevated should fail
+		$response = $this->subject->leaveAction($this->createRequest());
 		$responseData = json_decode($response->getBody()->getContents(), true);
 		$this->assertFalse($responseData['success']);
 
@@ -232,8 +213,8 @@ class ElevationControllerFunctionalTest extends FunctionalTestCase
 		]);
 	}
 
-	private function createRequest(array $parsedBody = []): ServerRequestInterface
+	private function createRequest(): ServerRequestInterface
 	{
-		return (new ServerRequest('http://localhost/test', 'POST'))->withParsedBody($parsedBody);
+		return new ServerRequest('http://localhost/test', 'POST');
 	}
 }

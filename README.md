@@ -26,7 +26,7 @@ The user can exit admin mode by using the same dropdown.
 
 1. **Login as regular user** - Admin users log in without admin privileges
 2. **Work normally** - Browse, edit content, and perform regular tasks
-3. **Elevate when needed** - Click the dropdown to become admin for specific tasks
+3. **Elevate when needed** - Click the dropdown to become admin for specific tasks, confirming your password in TYPO3's "Verify with user password" dialog (not asked in the Development context)
 4. **Auto-logout** - Admin privileges automatically expire after 10 minutes of inactivity
 
 ## Events

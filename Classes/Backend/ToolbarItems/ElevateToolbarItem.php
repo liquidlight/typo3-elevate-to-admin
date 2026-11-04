@@ -95,11 +95,7 @@ class ElevateToolbarItem implements ToolbarItemInterface, RequestAwareToolbarIte
 	private function addJavaScriptLanguageLabels(): void
 	{
 		$labels = [
-			'modal.enter_admin_title',
-			'modal.password_label',
-			'modal.password_placeholder',
 			'modal.cancel',
-			'modal.enter',
 			'modal.leave_admin_title',
 			'modal.leave_admin_message',
 			'modal.leave_admin_button',
@@ -109,7 +105,6 @@ class ElevateToolbarItem implements ToolbarItemInterface, RequestAwareToolbarIte
 			'js.elevation_request_failed',
 			'js.leave_admin_failed',
 			'js.leave_admin_request_failed',
-			'error.password_required',
 			'success.elevated_to_admin',
 		];
 

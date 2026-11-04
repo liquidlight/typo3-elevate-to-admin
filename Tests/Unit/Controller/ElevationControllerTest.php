@@ -9,9 +9,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
-use TYPO3\CMS\Core\Crypto\PasswordHashing\Argon2iPasswordHash;
-use TYPO3\CMS\Core\Crypto\PasswordHashing\BcryptPasswordHash;
-use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\JsonResponse;
@@ -37,20 +34,6 @@ class ElevationControllerTest extends TestCase
 	protected function setUp(): void
 	{
 		parent::setUp();
-
-		// Set up minimal TYPO3 configuration for password hashing
-		$GLOBALS['TYPO3_CONF_VARS']['SYS']['availablePasswordHashAlgorithms'] = [
-			Argon2iPasswordHash::class,
-			BcryptPasswordHash::class,
-		];
-		$GLOBALS['TYPO3_CONF_VARS']['BE']['passwordHashing'] = [
-			'className' => Argon2iPasswordHash::class,
-			'options' => [],
-		];
-		$GLOBALS['TYPO3_CONF_VARS']['FE']['passwordHashing'] = [
-			'className' => Argon2iPasswordHash::class,
-			'options' => [],
-		];
 
 		$this->loggerMock = $this->createMock(LoggerInterface::class);
 		$this->subject = new ElevationController($this->loggerMock);
@@ -79,7 +62,7 @@ class ElevationControllerTest extends TestCase
 
 	protected function tearDown(): void
 	{
-		unset($GLOBALS['BE_USER'], $GLOBALS['LANG'], $GLOBALS['TYPO3_CONF_VARS']);
+		unset($GLOBALS['BE_USER'], $GLOBALS['LANG']);
 		GeneralUtility::purgeInstances();
 		parent::tearDown();
 	}
@@ -87,11 +70,6 @@ class ElevationControllerTest extends TestCase
 	public function testElevateActionReturnsErrorWhenNoBackendUser(): void
 	{
 		unset($GLOBALS['BE_USER']);
-
-		$this->requestMock
-			->method('getParsedBody')
-			->willReturn([])
-		;
 
 		$response = $this->subject->elevateAction($this->requestMock);
 
@@ -101,36 +79,10 @@ class ElevationControllerTest extends TestCase
 		$this->assertStringStartsWith('translated_', $responseData['message']);
 	}
 
-	public function testElevateActionCallsLeaveAdminModeWhenActionIsLeave(): void
-	{
-		$GLOBALS['BE_USER'] = $this->backendUserMock;
-
-		$this->requestMock
-			->method('getParsedBody')
-			->willReturn(['action' => 'leave'])
-		;
-
-		$this->backendUserMock
-			->method('isAdmin')
-			->willReturn(false)
-		;
-
-		$response = $this->subject->elevateAction($this->requestMock);
-
-		$this->assertInstanceOf(JsonResponse::class, $response);
-		$responseData = json_decode($response->getBody()->getContents(), true);
-		$this->assertFalse($responseData['success']);
-	}
-
 	public function testElevateActionReturnsErrorWhenUserCannotElevate(): void
 	{
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
 		$this->backendUserMock->user = ['tx_elevatetoadmin_is_possible_admin' => 0];
-
-		$this->requestMock
-			->method('getParsedBody')
-			->willReturn(['password' => 'test'])
-		;
 
 		$response = $this->subject->elevateAction($this->requestMock);
 
@@ -150,11 +102,6 @@ class ElevationControllerTest extends TestCase
 			->willReturn(true)
 		;
 
-		$this->requestMock
-			->method('getParsedBody')
-			->willReturn(['password' => 'test'])
-		;
-
 		$response = $this->subject->elevateAction($this->requestMock);
 
 		$this->assertInstanceOf(JsonResponse::class, $response);
@@ -163,84 +110,17 @@ class ElevationControllerTest extends TestCase
 		$this->assertStringStartsWith('translated_', $responseData['message']);
 	}
 
-	public function testElevateActionReturnsErrorWhenPasswordEmpty(): void
+	public function testElevateActionSucceedsForElevatableUser(): void
 	{
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
-		$this->backendUserMock->user = ['tx_elevatetoadmin_is_possible_admin' => 1];
-
-		$this->backendUserMock
-			->method('isAdmin')
-			->willReturn(false)
-		;
-
-		$this->requestMock
-			->method('getParsedBody')
-			->willReturn(['password' => ''])
-		;
-
-		$response = $this->subject->elevateAction($this->requestMock);
-
-		$this->assertInstanceOf(JsonResponse::class, $response);
-		$responseData = json_decode($response->getBody()->getContents(), true);
-		$this->assertFalse($responseData['success']);
-		$this->assertStringStartsWith('translated_', $responseData['message']);
-	}
-
-	public function testElevateActionReturnsErrorWhenPasswordInvalid(): void
-	{
-		$GLOBALS['BE_USER'] = $this->backendUserMock;
-
-		// Create a real hashed password using TYPO3's password hashing
-		$passwordHashFactory = new PasswordHashFactory();
-		$hasher = $passwordHashFactory->getDefaultHashInstance('BE');
-		$hashedPassword = $hasher->getHashedPassword('correct_password');
-
-		$this->backendUserMock->user = [
-			'tx_elevatetoadmin_is_possible_admin' => 1,
-			'password' => $hashedPassword,
-		];
-
-		$this->backendUserMock
-			->method('isAdmin')
-			->willReturn(false)
-		;
-
-		$this->requestMock
-			->method('getParsedBody')
-			->willReturn(['password' => 'wrong_password'])
-		;
-
-		$response = $this->subject->elevateAction($this->requestMock);
-
-		$this->assertInstanceOf(JsonResponse::class, $response);
-		$responseData = json_decode($response->getBody()->getContents(), true);
-		$this->assertFalse($responseData['success']);
-		$this->assertStringStartsWith('translated_', $responseData['message']);
-	}
-
-	public function testElevateActionSucceedsWithValidPassword(): void
-	{
-		$GLOBALS['BE_USER'] = $this->backendUserMock;
-
-		// Create a real hashed password using TYPO3's password hashing
-		$passwordHashFactory = new PasswordHashFactory();
-		$hasher = $passwordHashFactory->getDefaultHashInstance('BE');
-		$hashedPassword = $hasher->getHashedPassword('correct_password');
-
 		$this->backendUserMock->user = [
 			'uid' => 123,
 			'tx_elevatetoadmin_is_possible_admin' => 1,
-			'password' => $hashedPassword,
 		];
 
 		$this->backendUserMock
 			->method('isAdmin')
 			->willReturn(false)
-		;
-
-		$this->requestMock
-			->method('getParsedBody')
-			->willReturn(['password' => 'correct_password'])
 		;
 
 		$this->connectionMock
@@ -257,7 +137,19 @@ class ElevationControllerTest extends TestCase
 		$this->assertStringStartsWith('translated_', $responseData['message']);
 	}
 
-	public function testLeaveAdminModeReturnsErrorWhenNotAdmin(): void
+	public function testLeaveActionReturnsErrorWhenNoBackendUser(): void
+	{
+		unset($GLOBALS['BE_USER']);
+
+		$response = $this->subject->leaveAction($this->requestMock);
+
+		$this->assertInstanceOf(JsonResponse::class, $response);
+		$responseData = json_decode($response->getBody()->getContents(), true);
+		$this->assertFalse($responseData['success']);
+		$this->assertStringStartsWith('translated_', $responseData['message']);
+	}
+
+	public function testLeaveActionReturnsErrorWhenNotAdmin(): void
 	{
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
 
@@ -266,12 +158,7 @@ class ElevationControllerTest extends TestCase
 			->willReturn(false)
 		;
 
-		$this->requestMock
-			->method('getParsedBody')
-			->willReturn(['action' => 'leave'])
-		;
-
-		$response = $this->subject->elevateAction($this->requestMock);
+		$response = $this->subject->leaveAction($this->requestMock);
 
 		$this->assertInstanceOf(JsonResponse::class, $response);
 		$responseData = json_decode($response->getBody()->getContents(), true);
@@ -279,7 +166,7 @@ class ElevationControllerTest extends TestCase
 		$this->assertStringStartsWith('translated_', $responseData['message']);
 	}
 
-	public function testLeaveAdminModeReturnsErrorWhenCannotLeavePermanent(): void
+	public function testLeaveActionReturnsErrorWhenCannotLeavePermanent(): void
 	{
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
 		$this->backendUserMock->user = [
@@ -292,12 +179,7 @@ class ElevationControllerTest extends TestCase
 			->willReturn(true)
 		;
 
-		$this->requestMock
-			->method('getParsedBody')
-			->willReturn(['action' => 'leave'])
-		;
-
-		$response = $this->subject->elevateAction($this->requestMock);
+		$response = $this->subject->leaveAction($this->requestMock);
 
 		$this->assertInstanceOf(JsonResponse::class, $response);
 		$responseData = json_decode($response->getBody()->getContents(), true);
@@ -305,7 +187,7 @@ class ElevationControllerTest extends TestCase
 		$this->assertStringStartsWith('translated_', $responseData['message']);
 	}
 
-	public function testLeaveAdminModeSucceedsWhenCurrentlyElevated(): void
+	public function testLeaveActionSucceedsWhenCurrentlyElevated(): void
 	{
 		$GLOBALS['BE_USER'] = $this->backendUserMock;
 		$this->backendUserMock->user = [
@@ -318,17 +200,12 @@ class ElevationControllerTest extends TestCase
 			->willReturn(true)
 		;
 
-		$this->requestMock
-			->method('getParsedBody')
-			->willReturn(['action' => 'leave'])
-		;
-
 		$this->connectionMock
 			->expects($this->once())
 			->method('update')
 		;
 
-		$response = $this->subject->elevateAction($this->requestMock);
+		$response = $this->subject->leaveAction($this->requestMock);
 
 		$this->assertInstanceOf(JsonResponse::class, $response);
 		$responseData = json_decode($response->getBody()->getContents(), true);
