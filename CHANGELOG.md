@@ -1,3 +1,11 @@
+# 2.4.0
+
+**4th November 2026**
+
+#### Feature
+
+- Use TYPO3 native "sudo mode" to elevate to admin: Better styling, less custom code and no password on dev (#16)
+
 # 2.3.1
 
 **16th October 2026**
